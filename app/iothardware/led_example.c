@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020 Huawei Device Co., Ltd.
+ * Copyright (c) 2020-2022 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -14,9 +14,7 @@
  */
 
 #include <stdio.h>
-
 #include <unistd.h>
-
 #include "ohos_init.h"
 #include "cmsis_os2.h"
 #include "iot_gpio.h"
@@ -25,6 +23,7 @@
 #define LED_TASK_STACK_SIZE 512
 #define LED_TASK_PRIO 25
 #define LED_TEST_GPIO 9 // for hispark_pegasus
+
 enum LedState {
     LED_ON = 0,
     LED_OFF,
@@ -77,7 +76,7 @@ static void LedExampleEntry(void)
     attr.priority = LED_TASK_PRIO;
 
     if (osThreadNew((osThreadFunc_t)LedTask, NULL, &attr) == NULL) {
-        printf("[LedExample] Falied to create LedTask!\n");
+        printf("[LedExample] Failed to create LedTask!\n");
     }
 }
 

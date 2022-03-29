@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020 Huawei Device Co., Ltd.
+ * Copyright (c) 2020-2022 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -12,7 +12,9 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 #include "example.h"
+#include <stdint.h>
 #include <feature.h>
 #include <securec.h>
 #include <ohos_init.h>
@@ -31,6 +33,7 @@ static Service g_example[] = {
     {GetName, Initialize, MessageHandle, GetTaskConfig}
 };
 static int g_initIndex = 0;
+
 static const char *GetName(Service *service)
 {
     // test cases demo 0
@@ -55,15 +58,15 @@ static const char *GetName(Service *service)
 static BOOL Initialize(Service *service, Identity identity)
 {
     (void)identity;
-    printf("[Task Test][TaskID:%p][Step:%d][Reg Finish S:%s]Time: %llu!\n",
-           osThreadGetId(), g_initIndex++, service->GetName(service), SAMGR_GetProcessTime());
+    printf("[Task Test][TaskID:%u][Step:%u][Reg Finish S:%s]Time: %llu!\n",
+           (int)osThreadGetId(), g_initIndex++, service->GetName(service), SAMGR_GetProcessTime());
     return TRUE;
 }
 
 static BOOL MessageHandle(Service *service, Request *msg)
 {
-    printf("[Task Test][TaskID:%p][Step:%d][S:%s] msgId<%d> \n",
-           osThreadGetId(), g_initIndex++, service->GetName(service), msg->msgId);
+    printf("[Task Test][TaskID:%u][Step:%u][S:%s] msgId<%d> \n",
+           (int)osThreadGetId(), g_initIndex++, service->GetName(service), msg->msgId);
     return FALSE;
 }
 
@@ -86,29 +89,34 @@ static void SInit(Service *demo)
 {
     SAMGR_GetInstance()->RegisterService(demo);
 
-    printf("[Task Test][TaskID:%p][Step:%d][SYSEX Reg S:%s]Time: %llu!\n",
-           osThreadGetId(), g_initIndex++, demo->GetName(demo), SAMGR_GetProcessTime());
+    printf("[Task Test][TaskID:%u][Step:%u][SYSEX Reg S:%s]Time: %llu!\n",
+           (int)osThreadGetId(), g_initIndex++, demo->GetName(demo), SAMGR_GetProcessTime());
 }
+
 static void S1Init(void)
 {
     // test cases demo 0
     SInit(&g_example[0]);
 }
+
 static void S2Init(void)
 {
     // test cases demo 1
     SInit(&g_example[1]);
 }
+
 static void S3Init(void)
 {
     // test cases demo 2
     SInit(&g_example[2]);
 }
+
 static void S4Init(void)
 {
     // test cases demo 3
     SInit(&g_example[3]);
 }
+
 SYSEX_SERVICE_INIT(S1Init);
 SYSEX_SERVICE_INIT(S2Init);
 SYSEX_SERVICE_INIT(S3Init);

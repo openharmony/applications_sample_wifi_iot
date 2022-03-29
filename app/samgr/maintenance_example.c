@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020 Huawei Device Co., Ltd.
+ * Copyright (c) 2020-2022 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -13,6 +13,7 @@
  * limitations under the License.
  */
 
+#include <stdint.h>
 #include <securec.h>
 #include <ohos_init.h>
 #include <cmsis_os.h>
@@ -27,6 +28,7 @@
 #define MAINTEN_SERVICE4 "mntn_s4"
 #define MAINTEN_FEATURE1 "mntn_f1"
 #define MAINTEN_FEATURE2 "mntn_f2"
+
 static const char *GetName(Service *service);
 static BOOL Initialize(Service *service, Identity identity);
 static BOOL MessageHandle(Service *service, Request *msg);
@@ -35,6 +37,7 @@ static const char *FEATURE_GetName(Feature *feature);
 static void FEATURE_OnInitialize(Feature *feature, Service *parent, Identity identity);
 static void FEATURE_OnStop(Feature *feature, Identity identity);
 static BOOL FEATURE_OnMessage(Feature *feature, Request *request);
+
 Service g_maintenExample1 = {GetName, Initialize, MessageHandle, GetTaskConfig};
 Service g_maintenExample2 = {GetName, Initialize, MessageHandle, GetTaskConfig};
 Service g_maintenExample3 = {GetName, Initialize, MessageHandle, GetTaskConfig};
@@ -142,22 +145,27 @@ static void S1Init(void)
 {
     SInit(&g_maintenExample1);
 }
+
 static void S2Init(void)
 {
     SInit(&g_maintenExample2);
 }
+
 static void S3Init(void)
 {
     SInit(&g_maintenExample3);
 }
+
 static void S4Init(void)
 {
     SInit(&g_maintenExample4);
 }
+
 static void F1Init(void)
 {
     FInit(&g_maintenFeature1);
 }
+
 static void F2Init(void)
 {
     FInit(&g_maintenFeature2);

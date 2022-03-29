@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020 Huawei Device Co., Ltd.
+ * Copyright (c) 2020-2022 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -12,7 +12,9 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 #include "example.h"
+#include <stdint.h>
 #include <ohos_init.h>
 #include <securec.h>
 #include <los_base.h>
@@ -39,19 +41,21 @@ static const char *GetName(Service *service)
     (void)service;
     return EXAMPLE_SERVICE;
 }
-static int g_regStep = 0;
+
+static uint32_t g_regStep = 0;
+
 static BOOL Initialize(Service *service, Identity identity)
 {
     ExampleService *example = (ExampleService *)service;
     example->identity = identity;
-    printf("[Register Test][TaskID:%p][Step:%d][Reg Finish S:%s]Time: %llu!\n",
-           osThreadGetId(), g_regStep++, service->GetName(service), SAMGR_GetProcessTime());
+    printf("[Register Test][TaskID:%u][Step:%u][Reg Finish S:%s]Time: %llu!\n",
+           (int)osThreadGetId(), g_regStep++, service->GetName(service), SAMGR_GetProcessTime());
     return TRUE;
 }
 
 static BOOL MessageHandle(Service *service, Request *msg)
 {
-    printf("[LPC Test][TaskID: %p] msgId<%d>: %s \n", osThreadGetId(), msg->msgId, (char *)msg->data);
+    printf("[LPC Test][TaskID:%u] msgId<%d>: %s \n", (int)osThreadGetId(), msg->msgId, (char *)msg->data);
     (void)service;
     return FALSE;
 }
@@ -63,12 +67,16 @@ static TaskConfig GetTaskConfig(Service *service)
                          0x800, 20, SHARED_TASK};
     return config;
 }
+
 static volatile uint32 g_asyncStep = 0;
+
 static void SyncCall(IUnknown *iUnknown)
 {
     (void)iUnknown;
-    printf("[LPC Test][TaskID:%p][Step:%d][SyncCall API] Default Success!\n", osThreadGetId(), g_asyncStep++);
+    printf("[LPC Test][TaskID:%u][Step:%u][SyncCall API] Default Success!\n", (int)osThreadGetId(),
+           g_asyncStep++);
 }
+
 static ExampleService g_example = {
     .GetName = GetName,
     .Initialize = Initialize,
@@ -83,61 +91,65 @@ static void Init(void)
 {
     SAMGR_GetInstance()->RegisterService((Service *)&g_example);
     SAMGR_GetInstance()->RegisterDefaultFeatureApi(EXAMPLE_SERVICE, GET_IUNKNOWN(g_example));
-    printf("[Register Test][TaskID:%p][Step:%d][Reg S:%s]Time: %llu!\n",
-           osThreadGetId(), g_regStep++, EXAMPLE_SERVICE, SAMGR_GetProcessTime());
+    printf("[Register Test][TaskID:%u][Step:%u][Reg S:%s]Time: %llu!\n",
+           (int)osThreadGetId(), g_regStep++, EXAMPLE_SERVICE, SAMGR_GetProcessTime());
 }
+
 SYSEX_SERVICE_INIT(Init);
 
-static int g_discoverStep = 0;
+static uint32_t g_discoverStep = 0;
+
 static DefaultFeatureApi *CASE_GetIUnknown(void)
 {
     DefaultFeatureApi *demoApi = NULL;
-    printf("[Discover Test][TaskID:%p][Step:%d][GetIUnknown S:%s]: BEGIN\n",
-           osThreadGetId(), g_discoverStep++, EXAMPLE_SERVICE);
+    printf("[Discover Test][TaskID:%u][Step:%u][GetIUnknown S:%s]: BEGIN\n",
+           (int)osThreadGetId(), g_discoverStep++, EXAMPLE_SERVICE);
     IUnknown *iUnknown = SAMGR_GetInstance()->GetDefaultFeatureApi(EXAMPLE_SERVICE);
     if (iUnknown == NULL) {
-        printf("[Discover Test][TaskID:%p][Step:%d][GetDefaultFeatureApi S:%s]Error is NULL!\n",
-               osThreadGetId(), g_discoverStep++, EXAMPLE_SERVICE);
+        printf("[Discover Test][TaskID:%u][Step:%u][GetDefaultFeatureApi S:%s]Error is NULL!\n",
+               (int)osThreadGetId(), g_discoverStep++, EXAMPLE_SERVICE);
         goto END;
     }
     int result = iUnknown->QueryInterface(iUnknown, DEFAULT_VERSION, (void **)&demoApi);
     if (result != 0 || demoApi == NULL) {
-        printf("[Discover Test][TaskID:%p][Step:%d][QueryInterface S:%s]Error is NULL!\n",
-               osThreadGetId(), g_discoverStep++, EXAMPLE_SERVICE);
+        printf("[Discover Test][TaskID:%u][Step:%u][QueryInterface S:%s]Error is NULL!\n",
+               (int)osThreadGetId(), g_discoverStep++, EXAMPLE_SERVICE);
         goto END;
     }
-    printf("[Discover Test][TaskID:%p][Step:%d][GetIUnknown S:%s]Success\n",
-           osThreadGetId(), g_discoverStep++, EXAMPLE_SERVICE);
+    printf("[Discover Test][TaskID:%u][Step:%u][GetIUnknown S:%s]Success\n",
+           (int)osThreadGetId(), g_discoverStep++, EXAMPLE_SERVICE);
 END:
-    printf("[Discover Test][TaskID:%p][Step:%d][GetIUnknown S:%s]: END\n",
-           osThreadGetId(), g_discoverStep++, EXAMPLE_SERVICE);
+    printf("[Discover Test][TaskID:%u][Step:%u][GetIUnknown S:%s]: END\n",
+           (int)osThreadGetId(), g_discoverStep++, EXAMPLE_SERVICE);
     return demoApi;
 }
 
-
 static void CASE_SyncCall(DefaultFeatureApi *defaultApi)
 {
-    printf("[LPC Test][TaskID:%p][Step:%d][DefaultFeature SyncCall]: BEGIN\n", osThreadGetId(), g_asyncStep++);
+    printf("[LPC Test][TaskID:%u][Step:%u][DefaultFeature SyncCall]: BEGIN\n", (int)osThreadGetId(),
+           g_asyncStep++);
     defaultApi->SyncCall((IUnknown *)defaultApi);
-    printf("[LPC Test][TaskID:%p][Step:%d][DefaultFeature SyncCall]: END\n", osThreadGetId(), g_asyncStep++);
+    printf("[LPC Test][TaskID:%u][Step:%u][DefaultFeature SyncCall]: END\n", (int)osThreadGetId(),
+           g_asyncStep++);
 }
 
 static void CASE_ReleaseIUnknown(DefaultFeatureApi *demoApi)
 {
-    printf("[Discover Test][TaskID:%p][Step:%d][ReleaseIUnknown S:%s]: BEGIN\n",
-           osThreadGetId(), g_discoverStep++, EXAMPLE_SERVICE);
+    printf("[Discover Test][TaskID:%u][Step:%u][ReleaseIUnknown S:%s]: BEGIN\n",
+           (int)osThreadGetId(), g_discoverStep++, EXAMPLE_SERVICE);
     int32 ref = demoApi->Release((IUnknown *)demoApi);
     if (ref <= 0) {
-        printf("[Discover Test][TaskID:%p][Step:%d][ReleaseIUnknown S:%s]Error ref is %d!\n",
-               osThreadGetId(), g_discoverStep++, EXAMPLE_SERVICE, ref);
+        printf("[Discover Test][TaskID:%u][Step:%u][ReleaseIUnknown S:%s]Error ref is %d!\n",
+               (int)osThreadGetId(), g_discoverStep++, EXAMPLE_SERVICE, ref);
         goto END;
     }
-    printf("[Discover Test][TaskID:%p][Step:%d][ReleaseIUnknown S:%s]Success\n",
-           osThreadGetId(), g_discoverStep++, EXAMPLE_SERVICE);
+    printf("[Discover Test][TaskID:%u][Step:%u][ReleaseIUnknown S:%s]Success\n",
+           (int)osThreadGetId(), g_discoverStep++, EXAMPLE_SERVICE);
 END:
-    printf("[Discover Test][TaskID:%p][Step:%d][ReleaseIUnknown S:%s]: END\n",
-           osThreadGetId(), g_discoverStep++, EXAMPLE_SERVICE);
+    printf("[Discover Test][TaskID:%u][Step:%u][ReleaseIUnknown S:%s]: END\n",
+           (int)osThreadGetId(), g_discoverStep++, EXAMPLE_SERVICE);
 }
+
 static void CASE_RegisterInvalidService(void)
 {
     Service service = {.GetName = NULL, .GetTaskConfig = NULL, .Initialize = NULL, .MessageHandle = NULL};
@@ -163,6 +175,7 @@ static void CASE_RegisterInvalidService(void)
     ret = SAMGR_GetInstance()->RegisterFeatureApi(EXAMPLE_SERVICE, EXAMPLE_FEATURE "2", GET_IUNKNOWN(entry));
     printf("Register Invalid " EXAMPLE_FEATURE "2 Api %s\n", ret ? "TRUE" : "FALSE");
 }
+
 static void RunTestCase(void)
 {
     DefaultFeatureApi *defaultApi = CASE_GetIUnknown();
@@ -170,4 +183,5 @@ static void RunTestCase(void)
     CASE_SyncCall(defaultApi);
     CASE_ReleaseIUnknown(defaultApi);
 }
+
 LAYER_INITCALL_DEF(RunTestCase, test, "test");

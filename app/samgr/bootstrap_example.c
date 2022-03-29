@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020 Huawei Device Co., Ltd.
+ * Copyright (c) 2020-2022 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -12,7 +12,9 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 #include "example.h"
+#include <stdint.h>
 #include <feature.h>
 #include <securec.h>
 #include <ohos_init.h>
@@ -24,6 +26,7 @@ typedef struct BootTestExample {
     Service service;
     Feature feature;
 } BootTestExample;
+
 static const char *GetName(Service *service);
 static BOOL Initialize(Service *service, Identity identity);
 static BOOL MessageHandle(Service *service, Request *msg);
@@ -47,7 +50,9 @@ static BootTestExample g_example[] = {
         .feature = {FEATURE_GetName, FEATURE_OnInitialize, FEATURE_OnStop, FEATURE_OnMessage}
     }
 };
-static int g_initIndex = 0;
+
+static uint32_t g_initIndex = 0;
+
 static const char *FEATURE_GetName(Feature *feature)
 {
     // test cases service 0
@@ -72,8 +77,9 @@ static const char *FEATURE_GetName(Feature *feature)
 static void FEATURE_OnInitialize(Feature *feature, Service *parent, Identity identity)
 {
     (void)identity;
-    printf("[Boot Test][TaskID:%p][Step:%d][Reg Finish S:%s, F:%s]Time: %llu!\n",
-           osThreadGetId(), g_initIndex++, parent->GetName(parent), feature->GetName(feature), SAMGR_GetProcessTime());
+    printf("[Boot Test][TaskID:%u][Step:%u][Reg Finish S:%s, F:%s]Time: %llu!\n",
+           (int)osThreadGetId(), g_initIndex++, parent->GetName(parent), feature->GetName(feature),
+           SAMGR_GetProcessTime());
 }
 
 static void FEATURE_OnStop(Feature *feature, Identity identity)
@@ -84,8 +90,8 @@ static void FEATURE_OnStop(Feature *feature, Identity identity)
 
 static BOOL FEATURE_OnMessage(Feature *feature, Request *request)
 {
-    printf("[Boot Test][TaskID:%p][Step:%d][F:%s] msgId<%d> \n",
-           osThreadGetId(), g_initIndex++, feature->GetName(feature), request->msgId);
+    printf("[Boot Test][TaskID:%u][Step:%u][F:%s] msgId<%d> \n",
+           (int)osThreadGetId(), g_initIndex++, feature->GetName(feature), request->msgId);
     return FALSE;
 }
 
@@ -113,15 +119,15 @@ static const char *GetName(Service *service)
 static BOOL Initialize(Service *service, Identity identity)
 {
     (void)identity;
-    printf("[Boot Test][TaskID:%p][Step:%d][Reg Finish S:%s]Time: %llu!\n",
-           osThreadGetId(), g_initIndex++, service->GetName(service), SAMGR_GetProcessTime());
+    printf("[Boot Test][TaskID:%u][Step:%u][Reg Finish S:%s]Time: %llu!\n",
+           (int)osThreadGetId(), g_initIndex++, service->GetName(service), SAMGR_GetProcessTime());
     return TRUE;
 }
 
 static BOOL MessageHandle(Service *service, Request *msg)
 {
-    printf("[Boot Test][TaskID:%p][Step:%d][S:%s] msgId<%d> \n",
-           osThreadGetId(), g_initIndex++, service->GetName(service), msg->msgId);
+    printf("[Boot Test][TaskID:%u][Step:%u][S:%s] msgId<%d> \n",
+           (int)osThreadGetId(), g_initIndex++, service->GetName(service), msg->msgId);
     return FALSE;
 }
 
@@ -132,77 +138,89 @@ static TaskConfig GetTaskConfig(Service *service)
                          0x400, 2, SHARED_TASK};
     return config;
 }
+
 static void MInit(void)
 {
-    printf("[Boot Test][TaskID:%p][Step:%d][CORE INIT]Time: %llu!\n",
-           osThreadGetId(), g_initIndex++, SAMGR_GetProcessTime());
+    printf("[Boot Test][TaskID:%u][Step:%u][CORE INIT]Time: %llu!\n",
+           (int)osThreadGetId(), g_initIndex++, SAMGR_GetProcessTime());
 }
 static void MRun(void)
 {
-    printf("[Boot Test][TaskID:%p][Step:%d][SYS RUN]Time: %llu!\n",
-           osThreadGetId(), g_initIndex++, SAMGR_GetProcessTime());
+    printf("[Boot Test][TaskID:%u][Step:%u][SYS RUN]Time: %llu!\n",
+           (int)osThreadGetId(), g_initIndex++, SAMGR_GetProcessTime());
 }
+
 static void SInit(BootTestExample *demo)
 {
     SAMGR_GetInstance()->RegisterService(&demo->service);
 
     // test cases service 2
     printf((demo < &g_example[2]) ?
-           "[Boot Test][TaskID:%p][Step:%d][SYS Reg S:%s]Time: %llu!\n" :
-           "[Boot Test][TaskID:%p][Step:%d][SYSEX Reg S:%s]Time: %llu!\n",
-           osThreadGetId(), g_initIndex++, demo->service.GetName(&demo->service), SAMGR_GetProcessTime());
+           "[Boot Test][TaskID:%u][Step:%u][SYS Reg S:%s]Time: %llu!\n" :
+           "[Boot Test][TaskID:%u][Step:%u][SYSEX Reg S:%s]Time: %llu!\n",
+           (int)osThreadGetId(), g_initIndex++, demo->service.GetName(&demo->service), SAMGR_GetProcessTime());
 }
+
 static void FInit(BootTestExample *demo)
 {
     SAMGR_GetInstance()->RegisterFeature(demo->service.GetName(&demo->service), &demo->feature);
 
     // test cases service 2
     printf((demo < &g_example[2]) ?
-           "[Boot Test][TaskID:%p][Step:%d][SYS Reg S:%s, F:%s]Time: %llu!\n" :
-           "[Boot Test][TaskID:%p][Step:%d][SYSEX Reg S:%s, F:%s]Time: %llu!\n",
-           osThreadGetId(), g_initIndex++, demo->service.GetName(&demo->service), demo->feature.GetName(&demo->feature),
-           SAMGR_GetProcessTime());
+           "[Boot Test][TaskID:%u][Step:%u][SYS Reg S:%s, F:%s]Time: %llu!\n" :
+           "[Boot Test][TaskID:%u][Step:%u][SYSEX Reg S:%s, F:%s]Time: %llu!\n",
+           (int)osThreadGetId(), g_initIndex++, demo->service.GetName(&demo->service),
+           demo->feature.GetName(&demo->feature), SAMGR_GetProcessTime());
 }
+
 static void S1Init(void)
 {
     // test cases service 0
     SInit(&g_example[0]);
 }
+
 static void S2Init(void)
 {
     // test cases service 1
     SInit(&g_example[1]);
 }
+
 static void F1Init(void)
 {
     // test cases feature 0
     FInit(&g_example[0]);
 }
+
 static void F2Init(void)
 {
     // test cases feature 1
     FInit(&g_example[1]);
 }
+
 static void S3Init(void)
 {
     // test cases service 2
     SInit(&g_example[2]);
 }
+
 static void S4Init(void)
 {
     // test cases service 3
     SInit(&g_example[3]);
 }
+
 static void F3Init(void)
 {
     // test cases feature 2
     FInit(&g_example[2]);
 }
+
 static void F4Init(void)
 {
     // test cases feature 3
     FInit(&g_example[3]);
 }
+
 CORE_INIT(MInit);
 SYS_RUN(MRun);
 // init pri first

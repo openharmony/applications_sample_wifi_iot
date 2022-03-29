@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020 Huawei Device Co., Ltd.
+ * Copyright (c) 2020-2022 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -14,11 +14,7 @@
  */
 #ifndef LITE_EXAMPLE_H
 #define LITE_EXAMPLE_H
-#ifdef __cplusplus
-#if __cplusplus
-extern "C" {
-#endif
-#endif
+
 #define EXAMPLE_SERVICE "example"
 #define EXAMPLE_FEATURE "example"
 
@@ -36,9 +32,5 @@ extern "C" {
 #define TASK_SERVICE2 "task_s2"
 #define TASK_SERVICE3 "task_s3"
 #define TASK_SERVICE4 "task_s4"
-#ifdef __cplusplus
-#if __cplusplus
-}
-#endif
-#endif
+
 #endif // LITE_EXAMPLE_H

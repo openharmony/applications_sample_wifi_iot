@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020 Huawei Device Co., Ltd.
+ * Copyright (c) 2020-2022 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -12,6 +12,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 #include <los_base.h>
 #include <securec.h>
 #include <ohos_init.h>
@@ -25,6 +26,7 @@
 #define TEST_SYS_SERVICE2 "tst_sys2"
 #define TEST_APP_SERVICE1 "tst_app1"
 #define TEST_APP_SERVICE2 "tst_app2"
+
 static const char *GetName(Service *service);
 static BOOL Initialize(Service *service, Identity identity);
 static BOOL MessageHandle(Service *service, Request *msg);
@@ -95,18 +97,22 @@ static void SS1Init(void)
 {
     SInit(&g_testSys1);
 }
+
 static void SS2Init(void)
 {
     SInit(&g_testSys2);
 }
+
 static void AS1Init(void)
 {
     SInit(&g_testApp1);
 }
+
 static void AS2Init(void)
 {
     SInit(&g_testApp2);
 }
+
 SYS_SERVICE_INIT(SS1Init);
 SYS_SERVICE_INIT(SS2Init);
 SYSEX_SERVICE_INIT(AS1Init);
