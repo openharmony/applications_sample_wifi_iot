@@ -46,6 +46,7 @@ if __name__ == "__main__":
     for single_app in all_app[1:]:
         print(single_app['entry'])
         print(single_app['all_actions'])
+        sys.stdout.flush()
         call_app_cmd = "hdc_std shell " + single_app['entry']
         send_file_cmd = "hdc_std file send {} {}"
         capture_screen_cmd = "hdc_std shell /data/screen_test/printscreen -f /data/screen_test/{}"
@@ -62,11 +63,15 @@ if __name__ == "__main__":
                 else:
                     pic_name = single_app['app_name'] + ".png"
                     raw_pic_name = single_app['app_name'] + ".pngraw"
-                next_cmd = capture_screen_cmd.format(pic_name)
+                EnterCmd(capture_screen_cmd.format(pic_name), 1)
+                EnterCmd(recv_file_cmd.format(pic_name, args.save_path), 1)
+                EnterCmd(recv_file_cmd.format(raw_pic_name, args.save_path), 1)
+                next_cmd = ""
             #cmp_cmd-level is stable, different to other cmd,so handle it specialy 
             elif type(single_action[1]) == str and single_action[1] == 'cmp_cmd-level':
                 next_cmd = ""
                 print(send_file_cmd.format(os.path.join(args.anwser_path, raw_pic_name), "/data/screen_test/train_set"))
+                sys.stdout.flush()
                 EnterCmd(send_file_cmd.format(os.path.join(args.anwser_path, raw_pic_name), "/data/screen_test/train_set"))
                 new_cmp_cmd = cmp_cmd.format(raw_pic_name, raw_pic_name)
                 if len(single_action) == 3:
@@ -75,13 +80,12 @@ if __name__ == "__main__":
                     tolerance = global_pos['cmp_cmd-level'][1]
                 p = EnterCmd(new_cmp_cmd, single_action[0])
                 num = re.findall(r'[-+]?\d+', p[0])
-                EnterCmd(recv_file_cmd.format(pic_name, args.save_path))
-                EnterCmd(recv_file_cmd.format(raw_pic_name, args.save_path))
                 if type(num) == list and len(num) > 0 and int(num[0]) < tolerance:
                     print("{} screenshot check is ok!\n\n".format(raw_pic_name))
                 else:
-                    print("{} screenshot check is abnarmal!\n\n".format(raw_pic_name))
+                    print("ERROR:{} screenshot check is abnarmal!\n\n".format(raw_pic_name))
                     cmp_status = cmp_status + 1
+                sys.stdout.flush()
             #other cmd handle
             elif type(single_action[1]) == str:
                 if single_action[1] not in single_app.keys():
@@ -98,8 +102,9 @@ if __name__ == "__main__":
                         if findsome != -1:
                             print("\"{}\" execut result success!\n\n".format(target_[0]))
                         else:
-                            print("\"{}\" execut result failed!\n\n".format(target_[0]))
+                            print("ERROR:\"{}\" execut result failed!\n\n".format(target_[0]))
                             cmp_status = cmp_status + 1
+                        sys.stdout.flush()
                 #this cmd only is a name of x,y postion, to get x,y an click it
                 else:
                     next_cmd = "hdc_std shell input -M -m {} {} -c 0".format(target_[0], target_[1])
@@ -109,9 +114,10 @@ if __name__ == "__main__":
             EnterCmd(next_cmd, single_action[0])
 
     if cmp_status != 0:
-        print("screenshot check is abnarmal {}".format(cmp_status))
+        print("ERROR:screenshot check is abnarmal {}".format(cmp_status))
         print("End of check, test failed!")
     else:
         print("screenshot check is ok {}".format(cmp_status))
         print("End of check, test succeeded!")
+    sys.stdout.flush()
     sys.exit(cmp_status)
