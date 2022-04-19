@@ -26,16 +26,20 @@
         </policylist>
         <filefilterlist>
             <filefilter name="defaultFilter" desc="Files not to check">
-                <filteritem type="filename" name="*.png|*.pngraw|*.json" desc="Temp files"/>
+                <filteritem type="filename" name="*.png|*.pngraw|*.json" desc="Test files"/>
+                <filteritem type="filename" name="printscreen|*.hap|hdf_audio_hdi_server_function_test" desc="Test files"/>
             </filefilter>
             <filefilter name="defaultPolicyFilter" desc="Filters for compatibility，license header policies">
                 <filteritem type="filename" name="*.png|*.pngraw|*.json" desc="NoLicenseHeader"/>
+                <filteritem type="filename" name="printscreen|*.hap|hdf_audio_hdi_server_function_test" desc="NoLicenseHeader"/>
             </filefilter>
             <filefilter name="copyrightPolicyFilter" desc="Filters for copyright header policies">
-                 <filteritem type="filename" name="*.png|*.pngraw|*.json" desc="InvalidCopyright file"/>
+                <filteritem type="filename" name="*.png|*.pngraw|*.json" desc="InvalidCopyright file"/>
+                <filteritem type="filename" name="printscreen|*.hap|hdf_audio_hdi_server_function_test" desc="InvalidCopyright file"/>
             </filefilter>
             <filefilter name="binaryFileTypePolicyFilter" desc="Filters for binary file policies">
-				<filteritem type="filename" name="*.png|*.pngraw|*.json" desc="already checked"/>
+                <filteritem type="filename" name="*.png|*.pngraw|*.json" desc="already checked"/>
+                <filteritem type="filename" name="printscreen|*.hap|hdf_audio_hdi_server_function_test" desc="already checked"/>
             </filefilter>
         </filefilterlist>
     </oatconfig>
