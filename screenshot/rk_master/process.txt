@@ -27,7 +27,6 @@ faultloggerd
 accountmgr
 time_service
 distributeddata
-medialibrary_se
 useriam
 updater_sa
 inputmethod_ser
