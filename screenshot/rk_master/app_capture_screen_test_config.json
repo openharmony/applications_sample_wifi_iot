@@ -41,7 +41,7 @@
     {
         "app_name": "photos",
         "entry": "aa start -a com.ohos.photos.MainAbility -b com.ohos.photos",
-        "all_actions": [[2, "permisson_ok-x-y"], [2, "permisson_ok-x-y"], [2, "recent-x-y"], [2, "recent_del-x-y"], [2, "recent-x-y"], [2, "recent_del-x-y"]]
+        "all_actions": [[2, "permisson_ok-x-y"], [2, "permisson_ok-x-y"], [2, "permisson_ok-x-y"], [2, "recent-x-y"], [2, "recent_del-x-y"], [2, "recent-x-y"], [2, "recent_del-x-y"]]
     },
     {
         "app_name": "photos",
@@ -69,6 +69,6 @@
     {
         "app_name": "note",
         "entry": "aa start -a com.ohos.note.MainAbility -b com.ohos.note",
-        "all_actions": [[2, "permisson_ok-x-y"], [2, "permisson_ok-x-y"], [2, "permisson_ok-x-y"], [2, "shot_cmd"], [2, "recent-x-y"], [2, "recent_del-x-y"], [2, "recent-x-y"], [2, "recent_del-x-y"], [2, "cmp_cmd-level"]]
+        "all_actions": [[2, "permisson_ok-x-y"], [2, "permisson_ok-x-y"], [2, "permisson_ok-x-y"], [2, "permisson_ok-x-y"], [2, "permisson_ok-x-y"], [2, "shot_cmd"], [2, "recent-x-y"], [2, "recent_del-x-y"], [2, "recent-x-y"], [2, "recent_del-x-y"], [2, "cmp_cmd-level"]]
     }
 ]
