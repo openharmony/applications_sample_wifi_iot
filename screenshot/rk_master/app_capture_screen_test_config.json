@@ -11,6 +11,22 @@
         "cmp_cmd-level":["", 443200]
     },
     {
+        "app_name": "lock",
+        "entry": "",
+        "hdc_list_cmd":["hdc_std list targets"],
+        "rm_lock_cmd":["hdc_std shell input -T -m 350 900 350 300"],
+        "reboot_cmd":["hdc_std shell reboot"],
+        "rm_data_cmd":["hdc_std shell rm -rf data/*"],
+        "powermode_cmd":["hdc_std shell \"power-shell setmode 602\""],
+        "mk_anwser_dir":["hdc_std shell mkdir -p /data/screen_test/train_set"],
+        "send_tool":["hdc_std file send D:\\DeviceTestTools\\printscreen\\printscreen /data/screen_test/"],
+        "chmod_tool":["hdc_std shell chmod 777 /data/screen_test/printscreen"],
+        "all_actions": [
+            [2, "rm_data_cmd"], [20, "reboot_cmd"],[3, "hdc_list_cmd"], [3, "powermode_cmd"], [3, "rm_lock_cmd"],
+            [3, "powermode_cmd"], [3, "rm_lock_cmd"], [3, "powermode_cmd"],
+            [2, "rm_lock_cmd"], [2, "rm_lock_cmd"], [1, "mk_anwser_dir"], [1, "send_tool"], [1, "chmod_tool"]]
+    },
+    {
         "app_name": "audio_render",
         "entry": "",
         "remount":["hdc_std shell mount -o rw,remount /"],
@@ -21,8 +37,8 @@
         "audio_render_test":["hdc_std shell \"cd /data && ./hdf_audio_hdi_server_function_test --gtest_filter=AudioServerFunctionTest.SUB_Audio_Function_Render_Test_* && rm *.xml\"", "[  PASSED  ] 12 tests."],
         "audio_capture_test":["hdc_std shell \"cd /data && ./hdf_audio_hdi_server_function_test --gtest_filter=AudioServerFunctionTest.SUB_Audio_Function_Capture_Test_* && rm *.xml\"", "[  PASSED  ] 10 test."],
         "all_actions": [
-          [2, "remount"], [2, "sendfile1"], [2, "sendfile2"], [2, "chmodfile1"],
-          [5, "audio_render_test"]
+            [2, "remount"], [2, "sendfile1"], [2, "sendfile2"], [2, "chmodfile1"],
+            [5, "audio_render_test"]
         ]
     },
     {
