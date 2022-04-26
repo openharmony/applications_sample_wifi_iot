@@ -43,10 +43,10 @@ if __name__ == "__main__":
 
     cmp_status = 0
     global_pos = all_app[0]
-    return_cmd = "hdc_std shell input -M -m {} {} -c 0".format(global_pos['return-x-y'][0], global_pos['return-x-y'][1])
-    recent_cmd = "hdc_std shell input -M -m {} {} -c 0".format(global_pos['recent-x-y'][0], global_pos['recent-x-y'][1])
-    home_cmd = "hdc_std shell input -M -m {} {} -c 0".format(global_pos['home-x-y'][0], global_pos['home-x-y'][1])
-    recent_del_cmd = "hdc_std shell input -M -m {} {} -c 0".format(global_pos['recent_del-x-y'][0], global_pos['recent_del-x-y'][1])
+    return_cmd = "hdc_std shell uinput -M -m {} {} -c 0".format(global_pos['return-x-y'][0], global_pos['return-x-y'][1])
+    recent_cmd = "hdc_std shell uinput -M -m {} {} -c 0".format(global_pos['recent-x-y'][0], global_pos['recent-x-y'][1])
+    home_cmd = "hdc_std shell uinput -M -m {} {} -c 0".format(global_pos['home-x-y'][0], global_pos['home-x-y'][1])
+    recent_del_cmd = "hdc_std shell uinput -M -m {} {} -c 0".format(global_pos['recent_del-x-y'][0], global_pos['recent_del-x-y'][1])
     os.system("hdc_std kill")
     os.system("hdc_std start")
     EnterCmd("hdc_std list targets", 1)
@@ -120,10 +120,10 @@ if __name__ == "__main__":
                         sys.stdout.flush()
                 #this cmd only is a name of x,y postion, to get x,y an click it
                 else:
-                    next_cmd = "hdc_std shell input -M -m {} {} -c 0".format(target_[0], target_[1])
-            #input x,y postion, to click it
+                    next_cmd = "hdc_std shell uinput -M -m {} {} -c 0".format(target_[0], target_[1])
+            #uinput x,y postion, to click it
             else:
-                next_cmd = "hdc_std shell input -M -m {} {} -c 0".format(single_action[1], single_action[2])
+                next_cmd = "hdc_std shell uinput -M -m {} {} -c 0".format(single_action[1], single_action[2])
             EnterCmd(next_cmd, single_action[0])
 
     if cmp_status != 0:
