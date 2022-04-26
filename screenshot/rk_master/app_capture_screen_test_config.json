@@ -14,7 +14,7 @@
         "app_name": "lock",
         "entry": "",
         "hdc_list_cmd":["hdc_std list targets"],
-        "rm_lock_cmd":["hdc_std shell input -T -m 350 900 350 300"],
+        "rm_lock_cmd":["hdc_std shell uinput -T -m 350 900 350 300"],
         "reboot_cmd":["hdc_std shell reboot"],
         "rm_data_cmd":["hdc_std shell rm -rf data/*"],
         "powermode_cmd":["hdc_std shell \"power-shell setmode 602\""],
