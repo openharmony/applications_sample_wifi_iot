@@ -49,24 +49,23 @@ def EnterCmd(mycmd, waittime = 0, printresult = 1):
     return result
 
 def connect_to_wifi(tools_path):
-    EnterCmd("hdc_std shell mkdir /data/l2tool")
-    EnterCmd("hdc_std file send {}\\l2tool\\busybox /data/l2tool".format(tools_path))
-    EnterCmd("hdc_std file send {}\\l2tool\\dhcpc.sh /data/l2tool".format(tools_path))
-    EnterCmd("hdc_std file send {}\\l2tool\\entry-debug-rich-signed.hap /data/l2tool".format(tools_path))
-    EnterCmd("hdc_std file send {}\\l2tool\\hostapd.conf /data/l2tool".format(tools_path))
-    EnterCmd("hdc_std file send {}\\l2tool\\iperf /data/l2tool".format(tools_path))
-    EnterCmd("hdc_std file send {}\\l2tool\\p2p_supplicant.conf /data/l2tool".format(tools_path))
-    EnterCmd("hdc_std file send {}\\l2tool\\p2p_supplicant1.conf /data/l2tool".format(tools_path))
-    EnterCmd("hdc_std file send {}\\l2tool\\udhcpd.conf /data/l2tool".format(tools_path))
-    EnterCmd("hdc_std file send {}\\l2tool\\wpa_supplicant.conf /data/l2tool".format(tools_path))
-    EnterCmd("hdc_std shell wpa_supplicant -B -d -i wlan0 -c /data/l2tool/wpa_supplicant.conf")
-    EnterCmd("hdc_std shell chmod 777 ./data/l2tool/busybox")
-    time.sleep(3)
-    cnt = 3
-    while 1:
+    EnterCmd("hdc_std shell mkdir /data/l2tool", 1)
+    EnterCmd("hdc_std file send {}\\l2tool\\busybox /data/l2tool".format(tools_path), 1)
+    EnterCmd("hdc_std file send {}\\l2tool\\dhcpc.sh /data/l2tool".format(tools_path), 1)
+    EnterCmd("hdc_std file send {}\\l2tool\\entry-debug-rich-signed.hap /data/l2tool".format(tools_path), 1)
+    EnterCmd("hdc_std file send {}\\l2tool\\hostapd.conf /data/l2tool".format(tools_path), 1)
+    EnterCmd("hdc_std file send {}\\l2tool\\iperf /data/l2tool".format(tools_path), 1)
+    EnterCmd("hdc_std file send {}\\l2tool\\p2p_supplicant.conf /data/l2tool".format(tools_path), 1)
+    EnterCmd("hdc_std file send {}\\l2tool\\p2p_supplicant1.conf /data/l2tool".format(tools_path), 1)
+    EnterCmd("hdc_std file send {}\\l2tool\\udhcpd.conf /data/l2tool".format(tools_path), 1)
+    EnterCmd("hdc_std file send {}\\l2tool\\wpa_supplicant.conf /data/l2tool".format(tools_path), 1)
+    EnterCmd("hdc_std shell wpa_supplicant -B -d -i wlan0 -c /data/l2tool/wpa_supplicant.conf", 1)
+    EnterCmd("hdc_std shell chmod 777 ./data/l2tool/busybox", 1)
+    cnt = 2
+    while cnt:
         try:
-            p = subprocess.check_output("hdc_std shell ./data/l2tool/busybox udhcpc -i wlan0 -s /data/l2tool/dhcpc.sh", timeout=12)
             MyPrint("hdc_std shell ./data/l2tool/busybox udhcpc -i wlan0 -s /data/l2tool/dhcpc.sh")
+            p = subprocess.check_output("hdc_std shell ./data/l2tool/busybox udhcpc -i wlan0 -s /data/l2tool/dhcpc.sh", timeout=8)
             MyPrint(p.decode(encoding="utf-8"))
             with open(os.path.join(args.save_path, 'shot_test.bat'), mode='a', encoding='utf-8') as      cmd_file:
                 cmd_file.write('hdc_std shell ./data/l2tool/busybox udhcpc -i wlan0 -s /data/l2tool/dhcpc.sh' + '\n')
@@ -76,28 +75,22 @@ def connect_to_wifi(tools_path):
             MyPrint(time_e)
             ret_code = 1
         if ret_code == 0:
-            break;
-        if cnt == 1:
-            return False
+            ip = re.findall(r"\b(?:[0-9]{1,3}\.){3}[0-9]{1,3}\b", p.decode(encoding="utf-8"))
+            MyPrint(ip)
+            if len(ip) <= 0:
+                break
+            if len(re.findall(r'(?<!\d)\d{1,3}\.\d{1,3}\.\d{1,3}(?=\.\d)', ip[0])) <= 0:
+                break
+            gate = str(re.findall(r'(?<!\d)\d{1,3}\.\d{1,3}\.\d{1,3}(?=\.\d)', ip[0])[0]) + ".1"
+            MyPrint(gate)
+            ifconfig="hdc_std shell ifconfig wlan0 {}".format(ip[0])
+            EnterCmd(ifconfig)
+            routeconfig="hdc_std shell ./data/l2tool/busybox route add default gw {} dev wlan0".format(gate)
+            EnterCmd(routeconfig)
+            break
         MyPrint("try {}".format(cnt))
         cnt -= 1
-        time.sleep(15)
-    ip = re.findall(r"\b(?:[0-9]{1,3}\.){3}[0-9]{1,3}\b", p.decode(encoding="utf-8"))
-    MyPrint(ip)
-    gate = str(re.findall(r'(?<!\d)\d{1,3}\.\d{1,3}\.\d{1,3}(?=\.\d)', ip[0])[0]) + ".1"
-    MyPrint(gate)
-    ifconfig="hdc_std shell ifconfig wlan0 {}".format(ip[0])
-    EnterCmd(ifconfig)
-    routeconfig="hdc_std shell ./data/l2tool/busybox route add default gw {} dev wlan0".format(gate)
-    EnterCmd(routeconfig)
-    p = EnterCmd("hdc_std shell ping www.baidu.com")
-    findsome = p.find("64 bytes from", 0, len(p))
-    if findsome != -1:
-        MyPrint("ping www.baidu.com success!\n\n")
-        return True
-    else:
-        MyPrint("ping www.baidu.com failed!\n\n")
-        return False
+        time.sleep(5)
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description='manual to this script')
@@ -134,6 +127,7 @@ if __name__ == "__main__":
     else:
         idx_list = args.test_num
 
+    fail_idx_list = []
     for idx in idx_list:
         single_app = all_app[idx]
         sys.stdout.flush()
@@ -179,7 +173,8 @@ if __name__ == "__main__":
                     else:
                         tolerance = global_pos['cmp_cmd-level'][1]
                     p = EnterCmd(new_cmp_cmd, single_action[0])
-                    num = re.findall(r'[-+]?\d+', p[0])
+                    num = re.findall(r'[-+]?\d+', p)
+                    MyPrint(num)
                     if type(num) == list and len(num) > 0 and int(num[0]) < tolerance:
                         testok = 1
                         MyPrint("{} screenshot check is ok!\n\n".format(raw_pic_name))
@@ -192,6 +187,9 @@ if __name__ == "__main__":
                     if len(single_action) == 3:
                         logfilepath = single_action[2]
                         next_cmd = "hdc_std file recv {} {}".format(logfilepath, args.save_path)
+                elif type(single_action[1]) == str and single_action[1] == 'connect_wifi':
+                    next_cmd = ""
+                    connect_to_wifi(args.tools_path)
                 #other cmd handle
                 elif type(single_action[1]) == str:
                     if single_action[1] not in single_app.keys():
@@ -207,10 +205,10 @@ if __name__ == "__main__":
                             findsome = result.find(target_[1], 0, len(result))
                             if findsome != -1:
                                 testok = 1
-                                MyPrint("\"{}\" execut result is ok!\n".format(target_[0]))
+                                MyPrint("\"{}\" check execut result is ok, find \"{}\"!\n".format(target_[0], target_[1]))
                             else:
                                 testok = -1
-                                MyPrint("\"{}\" execut result is abnarmal!\n".format(target_[0]))
+                                MyPrint("\"{}\" check execut result is not ok, not find \"{}\"!\n".format(target_[0], target_[1]))
                             sys.stdout.flush()
                     #this cmd only is a name of x,y postion, to get x,y an click it
                     else:
@@ -219,25 +217,23 @@ if __name__ == "__main__":
                 else:
                     next_cmd = "hdc_std shell uinput -M -m {} {} -c 0".format(single_action[1], single_action[2])
                 EnterCmd(next_cmd, single_action[0])
+            if fail_idx_list.count(idx):
+                fail_idx_list.remove(idx)
             if testok == 1:
                 MyPrint("testcase {}, {} is ok!\n\n".format(idx, single_app['app_name']))
                 testcnt = 0
             elif testok == -1:
                 MyPrint("ERROR:testcase {}, {} is failed!\n\n".format(idx, single_app['app_name']))
-                cmp_status = cmp_status + 1
+                fail_idx_list.append(idx)
                 testcnt -= 1
             else:
                 testcnt = 0
 
-    if connect_to_wifi(args.tools_path) == False:
-        MyPrint("ERROR:wifi connect error, test failed!!!")
-        cmp_status += 1
-
-    if cmp_status != 0:
-        MyPrint("ERROR:test is failed {}".format(cmp_status))
+    if len(fail_idx_list) != 0:
+        MyPrint("ERROR: {}, these testcase is failed".format(fail_idx_list))
         MyPrint("End of check, test failed!")
     else:
-        MyPrint("test is ok {}".format(cmp_status))
+        MyPrint("All testcase is ok")
         MyPrint("End of check, test succeeded!")
     sys.stdout.flush()
-    sys.exit(cmp_status)
+    sys.exit(len(fail_idx_list))
