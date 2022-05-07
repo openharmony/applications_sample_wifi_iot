@@ -8,6 +8,7 @@
         "permisson_no-x-y":[241, 690],
         "shot_cmd":[""],
         "remount":["hdc_std shell mount -o rw,remount /"],
+        "stop_hilog":["hdc_std shell hilog -w stop"],
         "cmp_cmd-level":["", 443200]
     },
     {
@@ -22,8 +23,9 @@
     {
         "app_name": "wifi_connect",
         "entry": "",
-		"check_ping_baidu":["hdc_std shell ping www.baidu.com", "64 bytes from"],
-        "all_actions": [[2, "connect_wifi"], [2, "check_ping_baidu"]]
+        "check_ping_baidu":["hdc_std shell ping www.baidu.com", "64 bytes from"],
+        "compress_log":["hdc_std shell \"cd /data/log/hilog && tar -cf wifi_connect_log.tar *\""],
+        "all_actions": [[2, "connect_wifi"], [2, "check_ping_baidu"], [2, "stop_hilog"], [2, "compress_log"], [2, "recv_log-file", "/data/log/hilog/wifi_connect_log.tar"]]
     },
     {
         "app_name": "launcher",
@@ -45,45 +47,47 @@
         "executefile1":["hdc_std shell ./data/hdf_audio_hdi_server_function_test"],
         "audio_render_test":["hdc_std shell \"cd /data && ./hdf_audio_hdi_server_function_test --gtest_filter=AudioServerFunctionTest.SUB_Audio_Function_Render_Test_* && rm *.xml\"", "[  PASSED  ] 12 tests."],
         "audio_capture_test":["hdc_std shell \"cd /data && ./hdf_audio_hdi_server_function_test --gtest_filter=AudioServerFunctionTest.SUB_Audio_Function_Capture_Test_* && rm *.xml\"", "[  PASSED  ] 10 test."],
+        "compress_log":["hdc_std shell \"cd /data/log/hilog && tar -cf audio_render_log.tar *\""],
         "all_actions": [
             [2, "remount"], [2, "sendfile1"], [2, "sendfile2"], [2, "chmodfile1"],
-            [5, "audio_render_test"]
+            [5, "audio_render_test"], [2, "stop_hilog"], [2, "compress_log"], [2, "recv_log-file", "/data/log/hilog/audio_render_log.tar"]
         ]
     },
     {
         "app_name": "camera",
-        "entry": "",
-        "start_hilog":["hdc_std shell \"hilog -r && hilog -w start -f camera_log -l 400000000 -m none\""],
-        "start_camera":["hdc_std shell aa start -a com.ohos.camera.MainAbility -b com.ohos.camera"],
-        "stop_hilog":["hdc_std shell hilog -w stop"],
+        "entry": "aa start -a com.ohos.camera.MainAbility -b com.ohos.camera",
         "check_result":["hdc_std shell \"cd /data/log/hilog && grep -nr PreviewOutputCallback\"", ""],
-        "compress_log":["hdc_std shell \"cd /data/log/hilog && tar -cf camera_log.tar camera_*\""],
+        "compress_log":["hdc_std shell \"cd /data/log/hilog && tar -cf camera_log.tar *\""],
         "clear_log":["hdc_std shell rm /data/log/hilog/*"],
         "all_actions": [
-            [2, "clear_log"], [1, "start_hilog"], [4, "start_camera"], [2, "permisson_ok-x-y"], [2, "permisson_ok-x-y"], [2, "permisson_ok-x-y"], [2, "permisson_ok-x-y"], [2, "permisson_ok-x-y"], [4, "permisson_ok-x-y"], [2, "stop_hilog"], [3, "check_result"], [2, "recent-x-y"], [2, "recent_del-x-y"], [2, "compress_log"], [2, "recv_log-file", "/data/log/hilog/camera_log.tar"], [2, "clear_log"]
+            [2, "permisson_ok-x-y"], [2, "permisson_ok-x-y"], [2, "permisson_ok-x-y"], [2, "permisson_ok-x-y"], [2, "permisson_ok-x-y"], [4, "permisson_ok-x-y"], [2, "stop_hilog"], [3, "check_result"], [2, "recent-x-y"], [2, "recent_del-x-y"], [2, "compress_log"], [2, "recv_log-file", "/data/log/hilog/camera_log.tar"], [2, "clear_log"]
         ]
     },
     {
         "app_name": "settings_keyboard",
         "entry": "aa start -a com.ohos.settings.MainAbility -b com.ohos.settings",
+        "compress_log":["hdc_std shell \"cd /data/log/hilog && tar -cf settings_keyboard_log.tar *\""],
         "all_actions": [
             [3, "shot_cmd", "settings"], [3, "cmp_cmd-level"], [3, 400, 120], [3, 400, 120], [20, 400, 80], [3, 400, 80],
-            [3, "shot_cmd", "keyboard"], [3, "recent-x-y"], [3, "recent_del-x-y"], [3, "recent-x-y"], [3, "recent_del-x-y"], [3, "cmp_cmd-level", 200000]
+            [3, "shot_cmd", "keyboard"], [3, "recent-x-y"], [3, "recent_del-x-y"], [3, "recent-x-y"], [3, "recent_del-x-y"], [3, "cmp_cmd-level", 200000], [2, "stop_hilog"], [2, "compress_log"], [2, "recv_log-file", "/data/log/hilog/settings_keyboard_log.tar"]
         ]
     },
     {
         "app_name": "photos",
         "entry": "aa start -a com.ohos.photos.MainAbility -b com.ohos.photos",
-        "all_actions": [[2, "permisson_ok-x-y"], [2, "permisson_ok-x-y"], [2, "permisson_ok-x-y"], [2, "shot_cmd"], [2, "recent-x-y"], [2, "recent_del-x-y"], [2, "cmp_cmd-level"], [2, "recent-x-y"], [2, "recent_del-x-y"]]
+        "compress_log":["hdc_std shell \"cd /data/log/hilog && tar -cf photos_log.tar *\""],
+        "all_actions": [[2, "permisson_ok-x-y"], [2, "permisson_ok-x-y"], [2, "permisson_ok-x-y"], [2, "shot_cmd"], [2, "recent-x-y"], [2, "recent_del-x-y"], [2, "cmp_cmd-level"], [2, "recent-x-y"], [2, "recent_del-x-y"], [2, "stop_hilog"], [2, "compress_log"], [2, "recv_log-file", "/data/log/hilog/photos_log.tar"]]
     },
     {
         "app_name": "distributedcalc",
         "entry": "aa start -a com.example.distributedcalc.default -b com.example.distributedcalc",
-        "all_actions": [[2, "permisson_ok-x-y"], [2, "permisson_ok-x-y"], [2, "shot_cmd"], [2, "recent-x-y"], [2, "recent_del-x-y"], [2, "cmp_cmd-level", 3686400], [2, "recent-x-y"], [2, "recent_del-x-y"]]
+        "compress_log":["hdc_std shell \"cd /data/log/hilog && tar -cf calc_log.tar *\""],
+        "all_actions": [[2, "permisson_ok-x-y"], [2, "permisson_ok-x-y"], [2, "shot_cmd"], [2, "recent-x-y"], [2, "recent_del-x-y"], [2, "cmp_cmd-level", 3686400], [2, "recent-x-y"], [2, "recent_del-x-y"], [2, "stop_hilog"], [2, "compress_log"], [2, "recv_log-file", "/data/log/hilog/calc_log.tar"]]
     },
     {
         "app_name": "note",
         "entry": "aa start -a com.ohos.note.MainAbility -b com.ohos.note",
-        "all_actions": [[2, "permisson_ok-x-y"], [2, "permisson_ok-x-y"], [2, "permisson_ok-x-y"], [2, "permisson_ok-x-y"], [2, "permisson_ok-x-y"], [2, "shot_cmd"], [2, "recent-x-y"], [2, "recent_del-x-y"], [2, "recent-x-y"], [2, "recent_del-x-y"], [2, "cmp_cmd-level"]]
+        "compress_log":["hdc_std shell \"cd /data/log/hilog && tar -cf note_log.tar *\""],
+        "all_actions": [[2, "permisson_ok-x-y"], [2, "permisson_ok-x-y"], [2, "permisson_ok-x-y"], [2, "permisson_ok-x-y"], [2, "permisson_ok-x-y"], [2, "shot_cmd"], [2, "recent-x-y"], [2, "recent_del-x-y"], [2, "recent-x-y"], [2, "recent_del-x-y"], [2, "cmp_cmd-level"], [2, "stop_hilog"], [2, "compress_log"], [2, "recv_log-file", "/data/log/hilog/note_log.tar"]]
     }
 ]
