@@ -36,7 +36,12 @@ def EnterCmd(mycmd, waittime = 0, printresult = 1):
         cmd_file.write(mycmd + '\n')
     cmd_file.close()
     with os.popen(mycmd) as p:
-        result = ''.join(p.readlines())
+        bf = p._stream.buffer.read()
+    try:
+        result=bf.decode().strip()
+    except UnicodeDecodeError:
+        result=bf.decode('gbk', errors='ignore').strip()
+
     if printresult == 1:
         MyPrint(mycmd)
         MyPrint(result)
@@ -70,7 +75,7 @@ def connect_to_wifi(tools_path):
             with open(os.path.join(args.save_path, 'shot_test.bat'), mode='a', encoding='utf-8') as      cmd_file:
                 cmd_file.write('hdc_std shell ./data/l2tool/busybox udhcpc -i wlan0 -s /data/l2tool/dhcpc.sh' + '\n')
             cmd_file.close()
-            ret_code = 0;
+            ret_code = 0
         except subprocess.TimeoutExpired as time_e:
             MyPrint(time_e)
             ret_code = 1
@@ -114,7 +119,9 @@ if __name__ == "__main__":
     home_cmd = "hdc_std shell uinput -M -m {} {} -c 0".format(global_pos['home-x-y'][0], global_pos['home-x-y'][1])
     recent_del_cmd = "hdc_std shell uinput -M -m {} {} -c 0".format(global_pos['recent_del-x-y'][0], global_pos['recent_del-x-y'][1])
     os.system("hdc_std start")
-    EnterCmd("hdc_std list targets", 1)
+    EnterCmd("hdc_std shell hilog -w stop", 1)
+    EnterCmd("hdc_std shell \"cd /data/log/hilog && tar -cf system_start_log.tar *\"", 1)
+    EnterCmd("hdc_std file recv /data/log/hilog/system_start_log.tar {}".format(args.save_path), 1)
     EnterCmd("hdc_std list targets", 1)
     EnterCmd("hdc_std list targets", 1)
     EnterCmd("hdc_std shell rm -rf /data/screen_test/train_set")
@@ -140,14 +147,18 @@ if __name__ == "__main__":
         with open(os.path.join(args.save_path, 'shot_test.bat'), mode='a', encoding='utf-8') as cmd_file:
             cmd_file.write("\n\n::::::case {} --- {} test start \n".format(idx, single_app['app_name']))
         cmd_file.close()
-        if single_app['entry'] != "":
-            EnterCmd(call_app_cmd, 5)
-        MyPrint(single_app['all_actions'])
         testcnt = 2
         while testcnt:
             testok = 0
             if testcnt == 1:
                 MyPrint(">>>>>>>>>>>>>>>>>>>>>>>Try again:\n")
+                with open(os.path.join(args.save_path, 'shot_test.bat'), mode='a', encoding='utf-8') as cmd_file:
+                    cmd_file.write("\n::::::Last failed, Try again \n")
+                cmd_file.close()
+            EnterCmd("hdc_std shell \"rm /data/log/hilog/*;hilog -r;hilog -w start -l 400000000 -m none\"", 1)
+            if single_app['entry'] != "":
+                EnterCmd(call_app_cmd, 5)
+            MyPrint(single_app['all_actions'])
             for single_action in single_app['all_actions']:
                 #shot_cmd is stable, different to other cmd,so handle it specialy
                 if type(single_action[1]) == str and single_action[1] == 'shot_cmd':
@@ -228,6 +239,7 @@ if __name__ == "__main__":
                 testcnt -= 1
             else:
                 testcnt = 0
+            EnterCmd("hdc_std shell hilog -w stop", 1)
 
     if len(fail_idx_list) != 0:
         MyPrint("ERROR: {}, these testcase is failed".format(fail_idx_list))
