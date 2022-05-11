@@ -83,7 +83,7 @@
     },
     {
         "app_name": "note",
-        "entry": "aa start -a com.ohos.note.MainAbility -b com.ohos.note",
+        "entry": "aa start -a MainAbility -b com.ohos.note",
         "all_actions": [[2, "permisson_ok-x-y"], [2, "permisson_ok-x-y"], [2, "permisson_ok-x-y"], [2, "permisson_ok-x-y"], [2, "permisson_ok-x-y"], [2, "shot_cmd"], [2, "recent-x-y"], [2, "recent_del-x-y"], [2, "recent-x-y"], [2, "recent_del-x-y"], [2, "cmp_cmd-level"]]
     }
 ]
