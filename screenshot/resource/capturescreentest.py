@@ -135,6 +135,7 @@ if __name__ == "__main__":
         idx_list = args.test_num
 
     fail_idx_list = []
+    fail_name_list = []
     for idx in idx_list:
         single_app = all_app[idx]
         sys.stdout.flush()
@@ -147,10 +148,10 @@ if __name__ == "__main__":
         with open(os.path.join(args.save_path, 'shot_test.bat'), mode='a', encoding='utf-8') as cmd_file:
             cmd_file.write("\n\n::::::case {} --- {} test start \n".format(idx, single_app['app_name']))
         cmd_file.close()
-        testcnt = 2
+        testcnt = 5
         while testcnt:
             testok = 0
-            if testcnt == 1:
+            if testcnt != 5:
                 MyPrint(">>>>>>>>>>>>>>>>>>>>>>>Try again:\n")
                 with open(os.path.join(args.save_path, 'shot_test.bat'), mode='a', encoding='utf-8') as cmd_file:
                     cmd_file.write("\n::::::Last failed, Try again \n")
@@ -230,12 +231,20 @@ if __name__ == "__main__":
                 EnterCmd(next_cmd, single_action[0])
             if fail_idx_list.count(idx):
                 fail_idx_list.remove(idx)
+            if fail_name_list.count(single_app['app_name']):
+                fail_name_list.remove(single_app['app_name'])
             if testok == 1:
                 MyPrint("testcase {}, {} is ok!\n\n".format(idx, single_app['app_name']))
                 testcnt = 0
             elif testok == -1:
                 MyPrint("ERROR:testcase {}, {} is failed!\n\n".format(idx, single_app['app_name']))
                 fail_idx_list.append(idx)
+                fail_name_list.append(single_app['app_name'])
+                if testcnt == 1 and single_app['app_name'] == 'launcher':
+                    MyPrint("ERROR: name {}, index {}, these testcase is failed".format(fail_name_list, fail_idx_list))
+                    MyPrint("End of check, test failed!")
+                    sys.stdout.flush()
+                    sys.exit(len(fail_idx_list))
                 testcnt -= 1
             else:
                 testcnt = 0
