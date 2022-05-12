@@ -27,7 +27,7 @@
         },
         "build": {
             "sub_component": [
-                "//applications/sample/wifi-iot/app"
+                "//applications/sample/wifi-iot/app:app"
             ],
             "inner_kits": [],
             "test": []
