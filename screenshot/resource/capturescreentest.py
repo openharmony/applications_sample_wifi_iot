@@ -172,6 +172,13 @@ if __name__ == "__main__":
                     EnterCmd(capture_screen_cmd.format(pic_name), 1)
                     EnterCmd(recv_file_cmd.format(pic_name, args.save_path), 1)
                     EnterCmd(recv_file_cmd.format(raw_pic_name, args.save_path), 1)
+                    p = EnterCmd("hdc_std shell ls -al /data/screen_test/{}".format(raw_pic_name), 1)
+                    no_such = re.findall(r'No such file or directory', p)
+                    print(no_such)
+                    if type(no_such) == list and len(no_such) > 0 and no_such[0] == 'No such file or directory':
+                        MyPrint("ERROR: {} screenshot failed!\n\n".format(raw_pic_name))
+                        MyPrint("End of check, test failed!")
+                        sys.exit(255)
                     next_cmd = ""
                 #cmp_cmd-level is stable, different to other cmd,so handle it specialy
                 elif type(single_action[1]) == str and single_action[1] == 'cmp_cmd-level':
