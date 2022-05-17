@@ -59,7 +59,7 @@
         "start_test":["hdc_std shell aa start -a ohos.acts.multimedia.video.videoplayer.MainAbility -b ohos.acts.multimedia.video.videoplayer"],
         "recover_log":["hdc_std shell \"cd data/log/hilog/;hilog -x > vedio_log.txt;hilog -b D"],
         "stop_hilog":["hdc_std shell hilog -w stop"],
-        "check_result":["hdc_std shell \"cd /data/log/hilog && grep -nr 'total cases'\"", "failure 0,error 0,pass 1"],
+        "check_result":["hdc_std shell \"cd /data/log/hilog && grep -nr 'total cases'\"", ""],
         "compress_log":["hdc_std shell \"cd /data/log/hilog && tar -cf vedio_log.tar vedio_*\""],
         "clear_log":["hdc_std shell rm /data/log/hilog/*"],
         "all_actions": [
@@ -73,7 +73,7 @@
         "entry": "",
         "remount":["hdc_std shell mount -o rw,remount /"],
         "sendfile1":["hdc_std file send D:\\DeviceTestTools\\screenshot\\audiotest\\hdf_audio_hdi_server_function_test /data/"],
-        "sendfile2":["hdc_std file send D:\\DeviceTestTools\\screenshot\\audiotest\\audiorendertest.wav /bin/"],
+        "sendfile2":["hdc_std file send D:\\DeviceTestTools\\screenshot\\audiotest\\audiorendertest.wav /data/"],
         "chmodfile1":["hdc_std shell chmod 777 /data/hdf_audio_hdi_server_function_test"],
         "executefile1":["hdc_std shell ./data/hdf_audio_hdi_server_function_test"],
         "audio_render_test":["hdc_std shell \"cd /data && ./hdf_audio_hdi_server_function_test --gtest_filter=AudioServerFunctionTest.SUB_Audio_Function_Render_Test_* && rm *.xml\"", "[  PASSED  ] 12 tests."],
