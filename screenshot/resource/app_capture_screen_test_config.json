@@ -57,7 +57,7 @@
         "close_auto_log":["hdc_std shell \"hilog -w stop;rm /data/log/hilog/*\""],
         "start_video_log":["hdc_std shell \"hilog -r;hilog -w start -l 400000000 -m none;hilog -G 512M\""],
         "start_test":["hdc_std shell aa start -a ohos.acts.multimedia.video.videoplayer.MainAbility -b ohos.acts.multimedia.video.videoplayer"],
-        "recover_log":["hdc_std shell \"cd data/log/hilog/;hilog -x > video_log.txt"],
+        "recover_log":["hdc_std shell \"cd data/log/hilog/;hilog -x > video_log.txt\""],
         "stop_hilog":["hdc_std shell hilog -w stop"],
         "check_result":["hdc_std shell \"cd /data/log/hilog && grep 'total cases' video_log.txt\"", ""],
         "compress_log":["hdc_std shell \"cd /data/log/hilog && tar -cf video_log.tar video_*\""],
