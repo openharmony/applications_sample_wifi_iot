@@ -102,8 +102,8 @@ if __name__ == "__main__":
     parser.add_argument('--config', type=str, default = './app_capture_screen_test_config.json')
     parser.add_argument('--test_num', type=int, nargs='+', default = [])
     parser.add_argument('--tools_path', type=str, default = 'D:\\DeviceTestTools')
-    parser.add_argument('--anwser_path', type=str, default = 'screenshot\\RK\\')
-    parser.add_argument('--save_path', type=str, default = './report/screenshot_1/')
+    parser.add_argument('--anwser_path', type=str, default = 'D:\\DeviceTestTools\\screenshot\\resource')
+    parser.add_argument('--save_path', type=str, default = 'D:\\DeviceTestTools\\screenshot')
     args = parser.parse_args()
 
     with open(args.config) as f:
