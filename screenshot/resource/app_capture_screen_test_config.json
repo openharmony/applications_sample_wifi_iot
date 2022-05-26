@@ -1,5 +1,7 @@
 [
     {
+        "DEVICE_1":[1, 2, 3, 4, 5],
+        "DEVICE_2":[6, 7, 8, 9, 10, 11],
         "return-x-y":[199, 1262],
         "recent-x-y":[500, 1262],
         "home-x-y":[350, 1262],
@@ -7,106 +9,99 @@
         "permisson_ok-x-y":[495, 690],
         "permisson_no-x-y":[241, 690],
         "shot_cmd":[""],
-        "remount":["hdc_std shell mount -o rw,remount /"],
-        "stop_hilog":["hdc_std shell hilog -w stop"],
-        "cmp_cmd-level":["", 443200]
+        "remount":["mount -o rw,remount"],
+        "stop_hilog":["hilog -w stop"],
+        "cmp_cmd-level":["", 443200],
+        "get_file_from_dev":[""],
+        "send_file_to_dev":["", ""]
     },
     {
         "app_name": "launcher",
         "entry": "",
-        "rm_lock_cmd":["hdc_std shell \"uinput -T -m 425 1000 425 400;sleep 2;uinput -T -m 425 400 425 1000\""],
-        "powermode_cmd":["hdc_std shell \"power-shell wakeup && power-shell setmode 602\""],
         "all_actions": [
-            [2, "rm_lock_cmd"], [2, "powermode_cmd"], [2, "rm_lock_cmd"], [2, "powermode_cmd"],
-            [2, "rm_lock_cmd"], [2, "rm_lock_cmd"], [2, "rm_lock_cmd"], [2, "shot_cmd"], [2, "cmp_cmd-level"]
+            [2, "shot_cmd"], [2, "cmp_cmd-level"]
         ]
     },
     {
         "app_name": "crash_check",
         "entry": "",
-        "compress_file_recv":["hdc_std shell \"cd /data/log/faultlog/temp && tar -cf crash_log.tar cppcrash*\""],
-        "crash_check":["hdc_std shell \"ls /data/log/faultlog/temp/ -al | wc -l\"", ""],
+        "compress_file_recv":["cd /data/log/faultlog/temp && tar -cf crash_log.tar cppcrash*"],
+        "crash_check":["ls /data/log/faultlog/temp/ -al | wc -l", ""],
         "all_actions": [
-            [2, "remount"], [2, "crash_check"], [2, "compress_file_recv"], [2, "recv_log-file", "/data/log/faultlog/temp/crash_log.tar"]
+            [2, "remount"], [2, "crash_check"], [2, "compress_file_recv"], [2, "get_file_from_dev", "/data/log/faultlog/temp/crash_log.tar"]
         ]
     },
     {
         "app_name": "notification_bar",
         "entry": "",
-        "pull_down_cmd":["hdc_std shell uinput -T -m 500 0 550 40"],
-        "swipe_up_cmd":["hdc_std shell uinput -T -m 500 500 550 300"],
-        "compress_log":["hdc_std shell \"cd /data/log/hilog && tar -cf notification_bar.tar *\""],
+        "pull_down_cmd":["uinput -T -m 500 0 550 40"],
+        "swipe_up_cmd":["uinput -T -m 500 500 550 300"],
+        "compress_log":["cd /data/log/hilog && tar -cf notification_bar.tar *"],
         "all_actions": [
             [2, "pull_down_cmd"], [2, "pull_down_cmd"], [2, "pull_down_cmd"], [2, "pull_down_cmd"],
-            [2, "shot_cmd"], [2, "cmp_cmd-level"], [1, "swipe_up_cmd"], [1, "swipe_up_cmd"], [2, "stop_hilog"], [2, "compress_log"], [2, "recv_log-file", "/data/log/hilog/notification_bar.tar"]
+            [2, "shot_cmd"], [2, "cmp_cmd-level"], [1, "swipe_up_cmd"], [1, "swipe_up_cmd"], [2, "stop_hilog"], [2, "compress_log"], [2, "get_file_from_dev", "/data/log/hilog/notification_bar.tar"]
         ]
     },
     {
         "app_name": "wifi_connect",
         "entry": "",
-        "check_ping_baidu":["hdc_std shell ping www.baidu.com", "64 bytes from"],
-        "compress_log":["hdc_std shell \"cd /data/log/hilog && tar -cf wifi_connect_log.tar *\""],
-        "all_actions": [[2, "connect_wifi"], [2, "check_ping_baidu"], [2, "stop_hilog"], [2, "compress_log"], [2, "recv_log-file", "/data/log/hilog/wifi_connect_log.tar"]]
+        "check_ping_baidu":["ping www.baidu.com", "64 bytes from"],
+        "compress_log":["cd /data/log/hilog && tar -cf wifi_connect_log.tar *"],
+        "all_actions": [[2, "connect_wifi"], [2, "check_ping_baidu"], [2, "stop_hilog"], [2, "compress_log"], [2, "get_file_from_dev", "/data/log/hilog/wifi_connect_log.tar"]]
     },
     {
-        "app_name": "vedio_test",
+        "app_name": "video_test",
         "entry": "",
-        "install_vedio_test":["hdc_std install D:\\DeviceTestTools\\screenshot\\vediotest\\ActsVideoPlayerJsTest.hap"],
-        "mk_test_dir":["hdc_std shell mkdir -p /data/app/el1/bundle/public/ohos.acts.multimedia.video.videoplayer/ohos.acts.multimedia.video.videoplayer/assets/entry/resources/rawfile"],
-        "send_vedio":["hdc_std file send D:\\DeviceTestTools\\screenshot\\vediotest\\H264_AAC.mp4 /data/app/el1/bundle/public/ohos.acts.multimedia.video.videoplayer/ohos.acts.multimedia.video.videoplayer/assets/entry/resources/rawfile/"],
-        "close_auto_log":["hdc_std shell \"hilog -w stop;rm /data/log/hilog/*\""],
-        "start_vedio_log":["hdc_std shell \"hilog -b X;hilog -b D -T JSApp;hilog -r\""],
-        "start_test":["hdc_std shell aa start -a ohos.acts.multimedia.video.videoplayer.MainAbility -b ohos.acts.multimedia.video.videoplayer"],
-        "recover_log":["hdc_std shell \"cd data/log/hilog/;hilog -x > vedio_log.txt;hilog -b D"],
-        "stop_hilog":["hdc_std shell hilog -w stop"],
-        "check_result":["hdc_std shell \"cd /data/log/hilog && grep -nr 'total cases'\"", ""],
-        "compress_log":["hdc_std shell \"cd /data/log/hilog && tar -cf vedio_log.tar vedio_*\""],
-        "clear_log":["hdc_std shell rm /data/log/hilog/*"],
+        "mk_test_dir":["mkdir -p /data/app/el1/bundle/public/ohos.acts.multimedia.video.videoplayer/ohos.acts.multimedia.video.videoplayer/assets/entry/resources/rawfile"],
+        "close_auto_log":["hilog -w stop;rm /data/log/hilog/*"],
+        "start_video_log":["hilog -r;hilog -w start -l 400000000 -m none;hilog -G 512M"],
+        "start_test":["aa start -a ohos.acts.multimedia.video.videoplayer.MainAbility -b ohos.acts.multimedia.video.videoplayer"],
+        "recover_log":["cd data/log/hilog/;hilog -x > video_log.txt"],
+        "check_result":["cd /data/log/hilog && grep -nr 'total cases'", ""],
+        "compress_log":["cd /data/log/hilog && tar -cf video_log.tar video_*"],
+        "clear_log":["rm /data/log/hilog/*"],
         "all_actions": [
-          [2, "install_vedio_test"], [2, "mk_test_dir"], [2, "remount"], [2, "send_vedio"], [2, "close_auto_log"],
-          [0, "start_vedio_log"], [15, "start_test"],[2, "recover_log"], [2, "stop_hilog"], [2, "check_result"], [2, "compress_log"],
-          [2, "recv_log-file", "/data/log/hilog/vedio_log.tar"], [2, "clear_log"], [2, "recent-x-y"], [2, "recent_del-x-y"], [2, "recent-x-y"], [2, "recent_del-x-y"]
+          [2, "install_hap", "vediotest/ActsVideoPlayerJsTest.hap"], [2, "mk_test_dir"], [2, "remount"], 
+          [2, "send_file_to_dev", "vediotest/H264_AAC.mp4", "/data/app/el1/bundle/public/ohos.acts.multimedia.video.videoplayer/ohos.acts.multimedia.video.videoplayer/assets/entry/resources/rawfile/"],
+          [15, "start_test"], [2, "stop_hilog"], [2, "check_result"], [2, "compress_log"],
+          [2, "get_file_from_dev", "/data/log/hilog/video_log.tar"], [2, "clear_log"], [2, "recent-x-y"], [2, "recent_del-x-y"], [2, "recent-x-y"], [2, "recent_del-x-y"]
         ]
     },
     {
         "app_name": "audio_render",
         "entry": "",
-        "remount":["hdc_std shell mount -o rw,remount /"],
-        "sendfile1":["hdc_std file send D:\\DeviceTestTools\\screenshot\\audiotest\\hdf_audio_hdi_server_function_test /data/"],
-        "sendfile2":["hdc_std file send D:\\DeviceTestTools\\screenshot\\audiotest\\audiorendertest.wav /data/"],
-        "chmodfile1":["hdc_std shell chmod 777 /data/hdf_audio_hdi_server_function_test"],
-        "executefile1":["hdc_std shell ./data/hdf_audio_hdi_server_function_test"],
-        "audio_render_test":["hdc_std shell \"cd /data && ./hdf_audio_hdi_server_function_test --gtest_filter=AudioServerFunctionTest.SUB_Audio_Function_Render_Test_* && rm *.xml\"", "[  PASSED  ] 12 tests."],
-        "audio_capture_test":["hdc_std shell \"cd /data && ./hdf_audio_hdi_server_function_test --gtest_filter=AudioServerFunctionTest.SUB_Audio_Function_Capture_Test_* && rm *.xml\"", "[  PASSED  ] 10 test."],
-        "compress_log":["hdc_std shell \"cd /data/log/hilog && tar -cf audio_render_log.tar *\""],
+        "remount":["mount -o rw,remount /"],
+        "chmodfile1":["chmod 777 /data/audio_renderer_unit_test"],
+        "audio_render_test":["cd /data && ./audio_renderer_unit_test && rm *.xml", ""],
+        "compress_log":["cd /data/log/hilog && tar -cf audio_render_log.tar *"],
         "all_actions": [
-            [2, "remount"], [2, "sendfile1"], [2, "sendfile2"], [2, "chmodfile1"],
-            [5, "audio_render_test"], [2, "stop_hilog"], [2, "compress_log"], [2, "recv_log-file", "/data/log/hilog/audio_render_log.tar"]
+            [2, "remount"], [2, "send_file_to_dev", "audiotest/audio_renderer_unit_test", "/data/"], [2, "send_file_to_dev", "audiotest/test_44100_2.wav", "/data/"], [2, "chmodfile1"],
+            [5, "audio_render_test"], [2, "stop_hilog"], [2, "compress_log"], [2, "get_file_from_dev", "/data/log/hilog/audio_render_log.tar"]
         ]
     },
     {
         "app_name": "camera",
         "entry": "",
-        "check_result":["hdc_std shell \"cd /data/log/hilog && grep -nr PreviewOutputCallback\"", ""],
-        "compress_log":["hdc_std shell \"cd /data/log/hilog && tar -cf camera_log.tar *\""],
-        "close_auto_log":["hdc_std shell \"hilog -w stop;rm /data/log/hilog/*\""],
-        "open_camera_log":["hdc_std shell \"hilog -b X;hilog -b D -T CAMERA;hilog -r\""],
-        "start_camera":["hdc_std shell aa start -a com.ohos.camera.MainAbility -b com.ohos.camera"],
-        "recover_log":["hdc_std shell \"cd data/log/hilog/;hilog -x > camera_log.txt;hilog -b D"],
+        "check_result":["cd /data/log/hilog && grep -nr PreviewOutputCallback", ""],
+        "compress_log":["cd /data/log/hilog && tar -cf camera_log.tar *"],
+        "close_auto_log":["hilog -w stop;rm /data/log/hilog/*"],
+        "open_camera_log":["hilog -b X;hilog -b D -T CAMERA;hilog -r"],
+        "start_camera":["aa start -a MainAbility -b com.ohos.camera"],
+        "recover_log":["cd data/log/hilog/;hilog -x > camera_log.txt;hilog -b D"],
         "take_photo-x-y":[360, 1050], "picture-x-y":[245, 1060], "to_photo-x-y":[225, 25],
         "first_pic-x-y":[100, 250], "pic_del1-x-y":[500, 1165], "pic_del2-x-y":[445, 1150],
         "all_actions": [
             [1, "close_auto_log"], [1, "open_camera_log"], [5, "start_camera"], [2, "permisson_ok-x-y"], [2, "permisson_ok-x-y"], [2, "permisson_ok-x-y"], [2, "permisson_ok-x-y"], [2, "permisson_ok-x-y"], [2, "permisson_ok-x-y"], [2, "recover_log"], [3, "check_result"],
-            [2, "shot_cmd"], [2, "recent-x-y"], [2, "recent_del-x-y"], [2, "compress_log"], [2, "recv_log-file", "/data/log/hilog/camera_log.tar"]
+            [2, "shot_cmd"], [2, "recent-x-y"], [2, "recent_del-x-y"], [2, "compress_log"], [2, "get_file_from_dev", "/data/log/hilog/camera_log.tar"]
         ]
     },
     {
         "app_name": "settings_keyboard",
         "entry": "aa start -a com.ohos.settings.MainAbility -b com.ohos.settings",
-        "compress_log":["hdc_std shell \"cd /data/log/hilog && tar -cf settings_keyboard_log.tar *\""],
+        "compress_log":["cd /data/log/hilog && tar -cf settings_keyboard_log.tar *"],
         "all_actions": [
             [3, "shot_cmd", "settings"], [3, "cmp_cmd-level"], [3, 400, 120], [3, 400, 120], [20, 400, 80], [3, 400, 80],
-            [3, "shot_cmd", "keyboard"], [3, "recent-x-y"], [3, "recent_del-x-y"], [3, "recent-x-y"], [3, "recent_del-x-y"], [3, "cmp_cmd-level", 200000], [2, "stop_hilog"], [2, "compress_log"], [2, "recv_log-file", "/data/log/hilog/settings_keyboard_log.tar"]
+            [3, "shot_cmd", "keyboard"], [3, "recent-x-y"], [3, "recent_del-x-y"], [3, "recent-x-y"], [3, "recent_del-x-y"], [3, "cmp_cmd-level", 200000], [2, "stop_hilog"], [2, "compress_log"], [2, "get_file_from_dev", "/data/log/hilog/settings_keyboard_log.tar"]
         ]
     },
     {
@@ -117,13 +112,13 @@
     {
         "app_name": "distributedcalc",
         "entry": "aa start -a com.example.distributedcalc.default -b com.example.distributedcalc",
-        "compress_log":["hdc_std shell \"cd /data/log/hilog && tar -cf calc_log.tar *\""],
-        "all_actions": [[2, "permisson_ok-x-y"], [2, "permisson_ok-x-y"], [2, "shot_cmd"], [2, "recent-x-y"], [2, "recent_del-x-y"], [2, "cmp_cmd-level", 200000], [2, "recent-x-y"], [2, "recent_del-x-y"], [2, "stop_hilog"], [2, "compress_log"], [2, "recv_log-file", "/data/log/hilog/calc_log.tar"]]
+        "compress_log":["cd /data/log/hilog && tar -cf calc_log.tar *"],
+        "all_actions": [[2, "permisson_ok-x-y"], [2, "permisson_ok-x-y"], [2, "shot_cmd"], [2, "recent-x-y"], [2, "recent_del-x-y"], [2, "cmp_cmd-level", 200000], [2, "recent-x-y"], [2, "recent_del-x-y"], [2, "stop_hilog"], [2, "compress_log"], [2, "get_file_from_dev", "/data/log/hilog/calc_log.tar"]]
     },
     {
         "app_name": "note",
         "entry": "aa start -a MainAbility -b com.ohos.note",
-        "compress_log":["hdc_std shell \"cd /data/log/hilog && tar -cf note_log.tar *\""],
-        "all_actions": [[2, "permisson_ok-x-y"], [2, "permisson_ok-x-y"], [2, "permisson_ok-x-y"], [2, "permisson_ok-x-y"], [2, "permisson_ok-x-y"], [2, "shot_cmd"], [2, "recent-x-y"], [2, "recent_del-x-y"], [2, "recent-x-y"], [2, "recent_del-x-y"], [2, "cmp_cmd-level"], [2, "stop_hilog"], [2, "compress_log"], [2, "recv_log-file", "/data/log/hilog/note_log.tar"]]
+        "compress_log":["cd /data/log/hilog && tar -cf note_log.tar *"],
+        "all_actions": [[2, "permisson_ok-x-y"], [2, "permisson_ok-x-y"], [2, "permisson_ok-x-y"], [2, "permisson_ok-x-y"], [2, "permisson_ok-x-y"], [2, "shot_cmd"], [2, "recent-x-y"], [2, "recent_del-x-y"], [2, "recent-x-y"], [2, "recent_del-x-y"], [2, "cmp_cmd-level"], [2, "stop_hilog"], [2, "compress_log"], [2, "get_file_from_dev", "/data/log/hilog/note_log.tar"]]
     }
 ]
