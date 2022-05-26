@@ -63,7 +63,7 @@ usbfnMaster_host
 usb_host
 blue_host
 wifi_hal_service
-com.ohos.systemui
+com.ohos.systemui:extension_process
 device_usage_st
-com.ohos.launcher
+com.ohos.launcher:extension_process
 power_host
