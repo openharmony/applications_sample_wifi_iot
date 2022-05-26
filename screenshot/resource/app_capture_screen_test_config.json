@@ -2,12 +2,12 @@
     {
         "DEVICE_1":[1, 2, 3, 4, 5],
         "DEVICE_2":[6, 7, 8, 9, 10, 11],
-        "return-x-y":[199, 1262],
-        "recent-x-y":[500, 1262],
-        "home-x-y":[350, 1262],
-        "recent_del-x-y":[350, 1140],
-        "permisson_ok-x-y":[495, 690],
-        "permisson_no-x-y":[241, 690],
+        "return-x-y":[210, 1240],
+        "recent-x-y":[515, 1240],
+        "home-x-y":[360, 1240],
+        "recent_del-x-y":[360, 1080],
+        "permisson_ok-x-y":[575, 700],
+        "permisson_no-x-y":[140, 700],
         "shot_cmd":[""],
         "remount":["mount -o rw,remount"],
         "stop_hilog":["hilog -w stop"],
@@ -34,7 +34,7 @@
     {
         "app_name": "notification_bar",
         "entry": "",
-        "pull_down_cmd":["uinput -T -m 500 0 550 40"],
+        "pull_down_cmd":["uinput -T -m 500 0 550 47"],
         "swipe_up_cmd":["uinput -T -m 500 500 550 300"],
         "compress_log":["cd /data/log/hilog && tar -cf notification_bar.tar *"],
         "all_actions": [
@@ -88,8 +88,6 @@
         "open_camera_log":["hilog -b X;hilog -b D -T CAMERA;hilog -r"],
         "start_camera":["aa start -a MainAbility -b com.ohos.camera"],
         "recover_log":["cd data/log/hilog/;hilog -x > camera_log.txt;hilog -b D"],
-        "take_photo-x-y":[360, 1050], "picture-x-y":[245, 1060], "to_photo-x-y":[225, 25],
-        "first_pic-x-y":[100, 250], "pic_del1-x-y":[500, 1165], "pic_del2-x-y":[445, 1150],
         "all_actions": [
             [1, "close_auto_log"], [1, "open_camera_log"], [5, "start_camera"], [2, "permisson_ok-x-y"], [2, "permisson_ok-x-y"], [2, "permisson_ok-x-y"], [2, "permisson_ok-x-y"], [2, "permisson_ok-x-y"], [2, "permisson_ok-x-y"], [2, "recover_log"], [3, "check_result"],
             [2, "shot_cmd"], [2, "recent-x-y"], [2, "recent_del-x-y"], [2, "compress_log"], [2, "get_file_from_dev", "/data/log/hilog/camera_log.tar"]
@@ -100,7 +98,7 @@
         "entry": "aa start -a com.ohos.settings.MainAbility -b com.ohos.settings",
         "compress_log":["cd /data/log/hilog && tar -cf settings_keyboard_log.tar *"],
         "all_actions": [
-            [3, "shot_cmd", "settings"], [3, "cmp_cmd-level"], [3, 400, 120], [3, 400, 120], [20, 400, 80], [3, 400, 80],
+            [3, "shot_cmd", "settings"], [3, "cmp_cmd-level"], [3, 360, 185], [3, 360, 185], [20, 360, 90], [3, 360, 90],
             [3, "shot_cmd", "keyboard"], [3, "recent-x-y"], [3, "recent_del-x-y"], [3, "recent-x-y"], [3, "recent_del-x-y"], [3, "cmp_cmd-level", 200000], [2, "stop_hilog"], [2, "compress_log"], [2, "get_file_from_dev", "/data/log/hilog/settings_keyboard_log.tar"]
         ]
     },
