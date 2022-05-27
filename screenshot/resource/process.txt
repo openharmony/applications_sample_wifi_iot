@@ -1,3 +1,8 @@
+####First_check_at_begin__Second_check_at_end__Two_results_must_be_same#####
+com.ohos.launcher:extension_process
+render_service
+
+####only_check_these_processes_are_exitst#####
 hdf_devmgr
 param_watcher
 storage_manager
@@ -8,7 +13,6 @@ storage_daemon
 udevd
 uinput_inject
 multimodalinput
-token_sync_serv
 huks_service
 memmgrservice
 bluetooth_servi
@@ -33,7 +37,6 @@ inputmethod_ser
 ui_service
 fms_service
 distributedfile
-distributedfile
 netmanager
 battery_stats
 dslm_service
@@ -46,7 +49,6 @@ hiview
 telephony
 usb_service
 camera_service
-render_service
 thermal
 foundation
 accesstoken_ser
@@ -65,5 +67,5 @@ blue_host
 wifi_hal_service
 com.ohos.systemui:extension_process
 device_usage_st
-com.ohos.launcher:extension_process
 power_host
+

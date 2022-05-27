@@ -1,7 +1,7 @@
 [
     {
-        "DEVICE_1":[1, 2, 3, 4, 5],
-        "DEVICE_2":[6, 7, 8, 9, 10, 11],
+        "DEVICE_1":[1, 2, 3, 4, 5, 8],
+        "DEVICE_2":[6, 7, 9, 10, 11],
         "return-x-y":[210, 1240],
         "recent-x-y":[515, 1240],
         "home-x-y":[360, 1240],
@@ -98,8 +98,8 @@
         "entry": "aa start -a com.ohos.settings.MainAbility -b com.ohos.settings",
         "compress_log":["cd /data/log/hilog && tar -cf settings_keyboard_log.tar *"],
         "all_actions": [
-            [3, "shot_cmd", "settings"], [3, "cmp_cmd-level"], [3, 360, 185], [3, 360, 185], [20, 360, 90], [3, 360, 90],
-            [3, "shot_cmd", "keyboard"], [3, "recent-x-y"], [3, "recent_del-x-y"], [3, "recent-x-y"], [3, "recent_del-x-y"], [3, "cmp_cmd-level", 200000], [2, "stop_hilog"], [2, "compress_log"], [2, "get_file_from_dev", "/data/log/hilog/settings_keyboard_log.tar"]
+            [2, "shot_cmd", "settings"], [2, "cmp_cmd-level"], [2, 360, 185], [2, 360, 185], [2, 360, 90], [2, 360, 90],
+            [2, "shot_cmd", "keyboard"], [2, "recent-x-y"], [2, "recent_del-x-y"], [2, "recent-x-y"], [2, "recent_del-x-y"], [2, "cmp_cmd-level", 200000], [2, "stop_hilog"], [2, "compress_log"], [2, "get_file_from_dev", "/data/log/hilog/settings_keyboard_log.tar"]
         ]
     },
     {

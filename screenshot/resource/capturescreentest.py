@@ -41,7 +41,7 @@ def EnterCmd(mycmd, waittime = 0, printresult = 1):
         EnterCmdRetry -= 1
         try:
             p = subprocess.Popen(mycmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
-            result, unused_err = p.communicate(timeout=15)
+            result, unused_err = p.communicate(timeout=25)
             try:
                 result=result.decode(encoding="utf-8")
             except UnicodeDecodeError:
@@ -50,9 +50,9 @@ def EnterCmd(mycmd, waittime = 0, printresult = 1):
         except Exception as e:
             result = 'retry failed again'
             PrintToLog(e)
-            PrintToLog("cmd_retry_trace_{}.png".format(CmdRetryCnt))
-            os.system("hdc_std -t {} shell \" snapshot_display -f /data/cmd_retry_trace_{}.png\"".format(args.device_num, CmdRetryCnt))
-            GetFileFromDev("/data/cmd_retry_trace_{}.png".format(CmdRetryCnt), args.save_path)
+            PrintToLog("cmd_retry_trace_{}_{}.png".format(args.device_num, CmdRetryCnt))
+            os.system("hdc_std -t {} shell \" snapshot_display -f /data/cmd_retry_trace_{}_{}.png\"".format(args.device_num, args.device_num, CmdRetryCnt))
+            GetFileFromDev("/data/cmd_retry_trace_{}_{}.png".format(args.device_num, CmdRetryCnt), args.save_path)
             CmdRetryCnt += 1
             p.kill()
     if printresult == 1:
@@ -84,7 +84,7 @@ def GetFileFromDev(src, dst):
     cmd = "hdc_std -t {} file recv \"{}\" \"{}\"".format(args.device_num, src, dst)
     return EnterCmd(cmd, 1, 1)
 
-def connect_to_wifi(tools_path):
+def ConnectToWifi(tools_path):
     EnterShellCmd("mkdir /data/l2tool", 1)
     SendFileToDev(os.path.normpath(os.path.join(tools_path, "l2tool/busybox")), "/data/l2tool/")
     SendFileToDev(os.path.normpath(os.path.join(tools_path, "l2tool/dhcpc.sh")), "/data/l2tool/")
@@ -97,7 +97,7 @@ def connect_to_wifi(tools_path):
             PrintToLog("hdc_std shell ./data/l2tool/busybox udhcpc -i wlan0 -s /data/l2tool/dhcpc.sh")
             p = subprocess.check_output(shlex.split("hdc_std -t {} shell ./data/l2tool/busybox udhcpc -i wlan0 -s /data/l2tool/dhcpc.sh".format(args.device_num)), timeout=8)
             PrintToLog(p.decode(encoding="utf-8"))
-            with open(os.path.join(args.save_path, 'shot_test_{}.bat'.format(args.device_num)), mode='a', encoding='utf-8') as      cmd_file:
+            with open(os.path.join(args.save_path, 'shot_test_{}.bat'.format(args.device_num)), mode='a', encoding='utf-8') as cmd_file:
                 cmd_file.write('hdc_std shell ./data/l2tool/busybox udhcpc -i wlan0 -s /data/l2tool/dhcpc.sh' + '\n')
             cmd_file.close()
             ret_code = 0
@@ -139,10 +139,7 @@ if __name__ == "__main__":
 
     with open(args.config) as f:
         all_app = json.load(f)
-    with open(os.path.join(args.save_path, 'shot_test_{}.bat'.format(args.device_num)), mode='w', encoding='utf-8') as cmd_file:
-        cmd_file.close()
-    with open(os.path.join(args.save_path, 'shot_test_{}.log'.format(args.device_num)), mode='w', encoding='utf-8') as log_file:
-        log_file.close()
+
     cmp_status = 0
     global_pos = all_app[0]
 
@@ -163,8 +160,8 @@ if __name__ == "__main__":
             rmlockcnt -= 1
 
         EnterShellCmd("hilog -w stop", 1)
-        EnterShellCmd("cd /data/log/hilog && tar -cf system_start_log.tar *", 1)
-        GetFileFromDev("/data/log/hilog/system_start_log.tar", args.save_path)
+        EnterShellCmd("cd /data/log/hilog && tar -cf system_start_log_{}.tar *".format(args.device_num), 1)
+        GetFileFromDev("/data/log/hilog/system_start_log_{}.tar".format(args.device_num), args.save_path)
         #print(os.path.normpath(os.path.join(args.anwser_path, "launcher.pngraw")))
         SendFileToDev(os.path.normpath(os.path.join(args.anwser_path, "launcher.pngraw")), "/data/screen_test/train_set")
         EnterShellCmd("/data/screen_test/printscreen -f /data/screen_test/rmlock.png", 1)
@@ -180,17 +177,43 @@ if __name__ == "__main__":
             os.system("hdc_std -t {} shell reboot".format(args.device_num))
             for i in range(5):
                 EnterCmd("hdc_std list targets", 10)
-
         else:
             PrintToLog("remove lock failed\n\n")
             break
+
+    PrintToLog("\n\n########## First check key processes start ##############")
+    lose_process = []
+    process_pid = {}
+    with open(os.path.normpath(os.path.join(args.tools_path, "resource/process.txt")), "r+") as f:
+        text = f.read()
+        two_check_process_list = text.split('#####')[1].split()[0:-1]
+        other_process_list = text.split('#####')[2].split()
+        for pname in two_check_process_list + other_process_list:
+            pids = EnterCmd("hdc_std -t {} shell pidof {}".format(args.device_num, pname), 0, 1)
+            try:
+                pidlist = pids.split()
+                int(pidlist[0])
+                for pid in pidlist:
+                    int(pid)
+                process_pid[pname] = pidlist
+            except:
+                lose_process.append(pname)
+    if lose_process:
+        PrintToLog("\n\nERROR: %s, These processes are not exist!!!\n" % lose_process)
+        PrintToLog("SmokeTest find some fatal problems!")
+        PrintToLog("End of check, test failed!")
+        sys.exit(99)
+    else:
+        PrintToLog("First processes check is ok\n")
+
     try:
         args.test_num.index('/')
         idx_total = args.test_num.split('/')
         if len(idx_total) != 2:
             PrintToLog("test_num is invaild !!!")
+            PrintToLog("SmokeTest find some key problems!")
             PrintToLog("End of check, test failed!")
-            sys.exit(1)
+            sys.exit(98)
         elif idx_total[1] == '1':
             idx_list = list(range(1, len(all_app)))
         else:
@@ -198,7 +221,6 @@ if __name__ == "__main__":
     except ValueError as e:
         PrintToLog(e)
         idx_list = list(map(eval, args.test_num.split()))
-
     PrintToLog(idx_list)
 
     fail_idx_list = []
@@ -237,20 +259,15 @@ if __name__ == "__main__":
                     else:
                         pic_name = "{}{}".format(single_app['app_name'], ".png")
                         raw_pic_name = single_app['app_name'] + ".pngraw"
+                    EnterShellCmd("rm /data/screen_test/{}_{}*".format(6 - testcnt, pic_name), 1)
                     EnterShellCmd(capture_screen_cmd.format(6 - testcnt, pic_name), 1)
                     GetFileFromDev("/data/screen_test/{}_{}".format(6 - testcnt, pic_name), args.save_path)
-                    p = EnterShellCmd("ls -al /data/screen_test/{}_{}".format(6 - testcnt, raw_pic_name), 1)
-                    no_such = re.findall(r'No such file or directory', p)
-                    PrintToLog(no_such)
-                    if type(no_such) == list and len(no_such) > 0 and no_such[0] == 'No such file or directory':
-                        PrintToLog("ERROR: {} screenshot failed!\n\n".format(raw_pic_name))
-                        PrintToLog("End of check, test failed!")
-                        sys.exit(255)
                     next_cmd = ""
                 #cmp_cmd-level is stable, different to other cmd,so handle it specialy
                 elif type(single_action[1]) == str and single_action[1] == 'cmp_cmd-level':
                     next_cmd = ""
                     sys.stdout.flush()
+                    EnterShellCmd("rm /data/train_set/{}".format(raw_pic_name), 1)
                     SendFileToDev(os.path.normpath(os.path.join(args.anwser_path, raw_pic_name)), "/data/screen_test/train_set")
                     new_cmp_cmd = cmp_cmd.format(6 - testcnt, raw_pic_name, raw_pic_name)
                     if len(single_action) == 3:
@@ -258,16 +275,24 @@ if __name__ == "__main__":
                     else:
                         tolerance = global_pos['cmp_cmd-level'][1]
                     p = EnterShellCmd(new_cmp_cmd, single_action[0])
+                    no_such = re.findall(r'No such file or directory', p)
+                    PrintToLog(no_such)
+                    if type(no_such) == list and len(no_such) > 0 and no_such[0] == 'No such file or directory':
+                        PrintToLog("ERROR: {} screenshot failed!\n\n".format(raw_pic_name))
+                        PrintToLog("SmokeTest find some key problems!")
+                        PrintToLog("End of check, test failed!")
+                        sys.exit(98)
                     num = re.findall(r'[-+]?\d+', p)
                     PrintToLog(num)
                     if type(num) == list and len(num) > 0 and int(num[0]) < tolerance:
-                        testok = 1
+                        if testok == 0:
+                            testok = 1
                         PrintToLog("{} screenshot check is ok!\n\n".format(raw_pic_name))
                     else:
                         testok = -1
                         PrintToLog("{} screenshot check is abnarmal!\n\n".format(raw_pic_name))
                     sys.stdout.flush()
-                    if testok == 1 or testcnt == 1:
+                    if testok == 1 or testcnt == 1 or smoke_first_failed != '':
                         old_name = os.path.normpath(os.path.join(args.save_path, "{}_{}".format(6 - testcnt, pic_name)))
                         GetFileFromDev("/data/screen_test/{}_{}".format(6 - testcnt, raw_pic_name), args.save_path)
                         os.system("rename {} {}".format(old_name, pic_name))
@@ -287,7 +312,7 @@ if __name__ == "__main__":
                         EnterCmd("hdc_std -t {} file send \"{}\" \"{}\"".format(args.device_num, os.path.normpath(os.path.join(args.tools_path, single_action[2])), single_action[3]))
                 elif type(single_action[1]) == str and single_action[1] == 'connect_wifi':
                     next_cmd = ""
-                    connect_to_wifi(args.tools_path)
+                    ConnectToWifi(args.tools_path)
                 #other cmd handle
                 elif type(single_action[1]) == str:
                     if single_action[1] not in single_app.keys():
@@ -338,15 +363,52 @@ if __name__ == "__main__":
         if smoke_first_failed == 'launcher':
             break
 
-    EnterShellCmd("cd /data/log/faultlog/temp && tar -cf after_test_crash_log.tar cppcrash*")
-    EnterCmd("hdc_std -t {} file recv /data/log/faultlog/temp/after_test_crash_log.tar {}".format(args.device_num, os.path.normpath(args.save_path)))
+    #key processes second check, and cmp to first check
+    PrintToLog("\n\n########## Second check key processes start ##############")
+    second_check_lose_process = []
+    for pname in two_check_process_list + other_process_list:
+        pids = EnterCmd("hdc_std -t {} shell pidof {}".format(args.device_num, pname), 0, 1)
+        try:
+            pidlist = pids.split()
+            if process_pid[pname] != pidlist:
+                if pname in two_check_process_list:
+                    PrintToLog("ERROR: pid of %s is different the first check" % pname)
+                    PrintToLog("SmokeTest find some fatal problems!")
+                    PrintToLog("End of check, test failed!")
+                    sys.exit(99)
+                else:
+                    PrintToLog("WARNNING: pid of %s is different the first check" % pname)
+            elif len(pidlist) != 1:
+                if pname in two_check_process_list:
+                    PrintToLog("ERROR: pid of %s is not only one" % pname)
+                    PrintToLog("SmokeTest find some fatal problems!")
+                    PrintToLog("End of check, test failed!")
+                    sys.exit(99)
+                else:
+                    PrintToLog("WARNNING: pid of %s is not only one" % pname)
+        except:
+            second_check_lose_process.append(pname)
+
+    if second_check_lose_process:
+        PrintToLog("ERROR: pid of %s is not exist" % pname)
+        PrintToLog("SmokeTest find some fatal problems!")
+        PrintToLog("End of check, test failed!")
+        sys.exit(99)
+    else:
+        PrintToLog("Second processes check is ok\n")
+
+    EnterShellCmd("cd /data/log/faultlog/temp && tar -cf after_test_crash_log_{}.tar cppcrash*".format(args.device_num))
+    GetFileFromDev("/data/log/faultlog/temp/after_test_crash_log_{}.tar".format(args.device_num), os.path.normpath(args.save_path))
     if len(fail_idx_list) != 0:
         PrintToLog("ERROR: name {}, index {}, these testcase is failed".format(fail_name_list, fail_idx_list))
         if fail_name_list.count('launcher') or fail_name_list.count('settings_keyboard'):
-            PrintToLog("End of check, Some Key APPs(launcher or setting) failed!")
+            PrintToLog("SmokeTest find some fatal problems!")
+            PrintToLog("End of check, test failed!")
+            sys.exit(99)
+        PrintToLog("SmokeTest find some key problems!")
         PrintToLog("End of check, test failed!")
+        sys.exit(98)
     else:
         PrintToLog("All testcase is ok")
         PrintToLog("End of check, test succeeded!")
-    sys.stdout.flush()
-    sys.exit(len(fail_idx_list))
+        sys.exit(0)
