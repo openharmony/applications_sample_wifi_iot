@@ -21,8 +21,11 @@ import argparse
 import re
 import subprocess
 import shlex
+import datetime
 
 def PrintToLog(str):
+    time = datetime.datetime.now()
+    str = "[{}] {}".format(time, str)
     print(str)
     with open(os.path.join(args.save_path, 'shot_test_{}.log'.format(args.device_num)), mode='a', encoding='utf-8') as log_file:
         console = sys.stdout
@@ -50,9 +53,6 @@ def EnterCmd(mycmd, waittime = 0, printresult = 1):
         except Exception as e:
             result = 'retry failed again'
             PrintToLog(e)
-            PrintToLog("cmd_retry_trace_{}_{}.png".format(args.device_num, CmdRetryCnt))
-            os.system("hdc_std -t {} shell \" snapshot_display -f /data/cmd_retry_trace_{}_{}.png\"".format(args.device_num, args.device_num, CmdRetryCnt))
-            GetFileFromDev("/data/cmd_retry_trace_{}_{}.png".format(args.device_num, CmdRetryCnt), args.save_path)
             CmdRetryCnt += 1
             p.kill()
     if printresult == 1:
@@ -147,10 +147,10 @@ if __name__ == "__main__":
     rebootcnt = 2
     while rebootcnt:
         rebootcnt -= 1
-        os.system("hdc_std start")
+        #os.system("hdc_std start")
         EnterCmd("hdc_std list targets", 1)
-        EnterCmd("hdc_std list targets", 1)
-        EnterShellCmd("rm -rf /data/screen_test/train_set")
+        #EnterCmd("hdc_std list targets", 1)
+        #EnterShellCmd("rm -rf /data/screen_test/train_set")
         EnterShellCmd("mkdir -p /data/screen_test/train_set")
         SendFileToDev(os.path.normpath(os.path.join(args.tools_path, "resource/printscreen")), "/data/screen_test/")
         EnterShellCmd("chmod 777 /data/screen_test/printscreen")
@@ -164,12 +164,14 @@ if __name__ == "__main__":
         GetFileFromDev("/data/log/hilog/system_start_log_{}.tar".format(args.device_num), args.save_path)
         #print(os.path.normpath(os.path.join(args.anwser_path, "launcher.pngraw")))
         SendFileToDev(os.path.normpath(os.path.join(args.anwser_path, "launcher.pngraw")), "/data/screen_test/train_set")
-        EnterShellCmd("/data/screen_test/printscreen -f /data/screen_test/rmlock.png", 1)
-        cmp_launcher = "cmp -l /data/screen_test/rmlock.pngraw /data/screen_test/train_set/launcher.pngraw | wc -l"
+        EnterShellCmd("/data/screen_test/printscreen -f /data/screen_test/launcher_{}.png".format(args.device_num), 1)
+        GetFileFromDev("/data/screen_test/launcher_{}.pngraw".format(args.device_num), args.save_path)
+        GetFileFromDev("/data/screen_test/launcher_{}.png".format(args.device_num), args.save_path)
+        cmp_launcher = "cmp -l /data/screen_test/launcher.pngraw /data/screen_test/train_set/launcher.pngraw | wc -l"
         p = EnterShellCmd(cmp_launcher, 1)
         num = re.findall(r'[-+]?\d+', p)
         PrintToLog(num)
-        if type(num) == list and len(num) > 0 and int(num[0]) < 1000000:
+        if type(num) == list and len(num) > 0 and int(num[0]) < 443200:
             PrintToLog("remove lock is ok!\n\n")
             break
         elif rebootcnt >= 1:
@@ -188,7 +190,8 @@ if __name__ == "__main__":
         text = f.read()
         two_check_process_list = text.split('#####')[1].split()[0:-1]
         other_process_list = text.split('#####')[2].split()
-        for pname in two_check_process_list + other_process_list:
+        #for pname in two_check_process_list + other_process_list:
+        for pname in two_check_process_list:
             pids = EnterCmd("hdc_std -t {} shell pidof {}".format(args.device_num, pname), 0, 1)
             try:
                 pidlist = pids.split()
@@ -198,6 +201,12 @@ if __name__ == "__main__":
                 process_pid[pname] = pidlist
             except:
                 lose_process.append(pname)
+        all_p = EnterShellCmd("ps -elf")
+        for pname in other_process_list:
+            findp = all_p.find(pname, 0, len(all_p))
+            if findp == -1:
+                lose_process.append(pname)
+
     if lose_process:
         PrintToLog("\n\nERROR: %s, These processes are not exist!!!\n" % lose_process)
         PrintToLog("SmokeTest find some fatal problems!")
@@ -366,7 +375,8 @@ if __name__ == "__main__":
     #key processes second check, and cmp to first check
     PrintToLog("\n\n########## Second check key processes start ##############")
     second_check_lose_process = []
-    for pname in two_check_process_list + other_process_list:
+    #for pname in two_check_process_list + other_process_list:
+    for pname in two_check_process_list:
         pids = EnterCmd("hdc_std -t {} shell pidof {}".format(args.device_num, pname), 0, 1)
         try:
             pidlist = pids.split()
