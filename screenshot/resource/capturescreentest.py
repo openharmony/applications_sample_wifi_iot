@@ -167,21 +167,23 @@ if __name__ == "__main__":
         EnterShellCmd("/data/screen_test/printscreen -f /data/screen_test/launcher_{}.png".format(args.device_num), 1)
         GetFileFromDev("/data/screen_test/launcher_{}.pngraw".format(args.device_num), args.save_path)
         GetFileFromDev("/data/screen_test/launcher_{}.png".format(args.device_num), args.save_path)
-        cmp_launcher = "cmp -l /data/screen_test/launcher.pngraw /data/screen_test/train_set/launcher.pngraw | wc -l"
+        cmp_launcher = "cmp -l /data/screen_test/launcher_{}.pngraw /data/screen_test/train_set/launcher.pngraw | wc -l".format(args.device_num)
         p = EnterShellCmd(cmp_launcher, 1)
         num = re.findall(r'[-+]?\d+', p)
         PrintToLog(num)
-        if type(num) == list and len(num) > 0 and int(num[0]) < 443200:
+        if type(num) == list and len(num) > 0 and int(num[0]) < 443200 and p.find('No such file or directory', 0, len(p)) == -1:
             PrintToLog("remove lock is ok!\n\n")
             break
         elif rebootcnt >= 1:
             PrintToLog("remove lock failed, reboot and try!!!\n\n")
-            os.system("hdc_std -t {} shell reboot".format(args.device_num))
+            EnterShellCmd("reboot")
             for i in range(5):
                 EnterCmd("hdc_std list targets", 10)
         else:
-            PrintToLog("remove lock failed\n\n")
-            break
+            PrintToLog("ERROR: remove lock failed\n\n")
+            PrintToLog("SmokeTest find some fatal problems!")
+            PrintToLog("End of check, test failed!")
+            sys.exit(99)
 
     PrintToLog("\n\n########## First check key processes start ##############")
     lose_process = []
@@ -284,16 +286,11 @@ if __name__ == "__main__":
                     else:
                         tolerance = global_pos['cmp_cmd-level'][1]
                     p = EnterShellCmd(new_cmp_cmd, single_action[0])
-                    no_such = re.findall(r'No such file or directory', p)
-                    PrintToLog(no_such)
-                    if type(no_such) == list and len(no_such) > 0 and no_such[0] == 'No such file or directory':
-                        PrintToLog("ERROR: {} screenshot failed!\n\n".format(raw_pic_name))
-                        PrintToLog("SmokeTest find some key problems!")
-                        PrintToLog("End of check, test failed!")
-                        sys.exit(98)
+                    #no_such = re.findall(r'No such file or directory', p)
+                    #PrintToLog(no_such)
                     num = re.findall(r'[-+]?\d+', p)
                     PrintToLog(num)
-                    if type(num) == list and len(num) > 0 and int(num[0]) < tolerance:
+                    if type(num) == list and len(num) > 0 and int(num[0]) < tolerance and p.find('No such file or directory', 0, len(p)) == -1:
                         if testok == 0:
                             testok = 1
                         PrintToLog("{} screenshot check is ok!\n\n".format(raw_pic_name))
