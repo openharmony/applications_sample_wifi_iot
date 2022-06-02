@@ -28,7 +28,7 @@
     {
         "app_name": "notification_bar",
         "entry": "",
-        "pull_down_cmd":["uinput -T -m 500 0 550 47"],
+        "pull_down_cmd":["uinput -T -m 500 0 550 30"],
         "swipe_up_cmd":["uinput -T -m 500 500 550 300"],
         "compress_log":["cd /data/log/hilog && tar -cf notification_bar.tar *"],
         "all_actions": [
