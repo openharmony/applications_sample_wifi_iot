@@ -70,6 +70,11 @@ def EnterCmd(mycmd, waittime = 0, printresult = 1):
             cmd_file.close()
     return result
 
+def SysExit():
+    EnterShellCmd("cd /data/log/faultlog/temp && tar -cf after_test_crash_log_{}.tar cppcrash*".format(args.device_num))
+    GetFileFromDev("/data/log/faultlog/temp/after_test_crash_log_{}.tar".format(args.device_num), os.path.normpath(args.save_path))
+    sys.exit(99)
+
 def EnterShellCmd(shellcmd, waittime = 0, printresult = 1):
     if shellcmd == "":
         return
@@ -147,10 +152,7 @@ if __name__ == "__main__":
     rebootcnt = 2
     while rebootcnt:
         rebootcnt -= 1
-        #os.system("hdc_std start")
         EnterCmd("hdc_std list targets", 1)
-        #EnterCmd("hdc_std list targets", 1)
-        #EnterShellCmd("rm -rf /data/screen_test/train_set")
         EnterShellCmd("mkdir -p /data/screen_test/train_set")
         SendFileToDev(os.path.normpath(os.path.join(args.tools_path, "resource/printscreen")), "/data/screen_test/")
         EnterShellCmd("chmod 777 /data/screen_test/printscreen")
@@ -183,7 +185,7 @@ if __name__ == "__main__":
             PrintToLog("ERROR: remove lock failed\n\n")
             PrintToLog("SmokeTest find some fatal problems!")
             PrintToLog("End of check, test failed!")
-            sys.exit(99)
+            SysExit()
 
     PrintToLog("\n\n########## First check key processes start ##############")
     lose_process = []
@@ -213,7 +215,7 @@ if __name__ == "__main__":
         PrintToLog("\n\nERROR: %s, These processes are not exist!!!\n" % lose_process)
         PrintToLog("SmokeTest find some fatal problems!")
         PrintToLog("End of check, test failed!")
-        sys.exit(99)
+        SysExit()
     else:
         PrintToLog("First processes check is ok\n")
 
@@ -319,6 +321,23 @@ if __name__ == "__main__":
                 elif type(single_action[1]) == str and single_action[1] == 'connect_wifi':
                     next_cmd = ""
                     ConnectToWifi(args.tools_path)
+                #process_crash_check
+                elif type(single_action[1]) == str and single_action[1] == 'process_crash_check':
+                    next_cmd = ""
+                    if len(single_action) == 3:
+                        p = EnterShellCmd("cd /data/log/faultlog/temp && grep \"Process name\" -rnw ./", single_action[0])
+                        result = "".join(p)
+                        findsome = result.find(single_action[2], 0, len(result))
+                        if findsome != -1:
+                            testok = -1
+                            PrintToLog("\"{}\" ERROR:find crux crash \"{}\"!\n".format(single_action[1], single_action[2]))
+                            PrintToLog("SmokeTest find some fatal problems!")
+                            PrintToLog("End of check, test failed!")
+                            SysExit()
+                        else:
+                            testok = 1
+                            PrintToLog("\"{}\" check execut result is ok, not find crux crash \"{}\"!\n".format(single_action[1], single_action[2]))
+                        sys.stdout.flush()
                 #other cmd handle
                 elif type(single_action[1]) == str:
                     if single_action[1] not in single_app.keys():
@@ -368,7 +387,7 @@ if __name__ == "__main__":
             EnterShellCmd("hilog -w stop", 1)
         if smoke_first_failed == 'launcher':
             break
-
+    
     #key processes second check, and cmp to first check
     PrintToLog("\n\n########## Second check key processes start ##############")
     second_check_lose_process = []
@@ -382,7 +401,7 @@ if __name__ == "__main__":
                     PrintToLog("ERROR: pid of %s is different the first check" % pname)
                     PrintToLog("SmokeTest find some fatal problems!")
                     PrintToLog("End of check, test failed!")
-                    sys.exit(99)
+                    SysExit()
                 else:
                     PrintToLog("WARNNING: pid of %s is different the first check" % pname)
             elif len(pidlist) != 1:
@@ -390,7 +409,7 @@ if __name__ == "__main__":
                     PrintToLog("ERROR: pid of %s is not only one" % pname)
                     PrintToLog("SmokeTest find some fatal problems!")
                     PrintToLog("End of check, test failed!")
-                    sys.exit(99)
+                    SysExit()
                 else:
                     PrintToLog("WARNNING: pid of %s is not only one" % pname)
         except:
@@ -400,7 +419,7 @@ if __name__ == "__main__":
         PrintToLog("ERROR: pid of %s is not exist" % pname)
         PrintToLog("SmokeTest find some fatal problems!")
         PrintToLog("End of check, test failed!")
-        sys.exit(99)
+        SysExit()
     else:
         PrintToLog("Second processes check is ok\n")
 
@@ -411,7 +430,7 @@ if __name__ == "__main__":
         if fail_name_list.count('launcher') or fail_name_list.count('settings_keyboard'):
             PrintToLog("SmokeTest find some fatal problems!")
             PrintToLog("End of check, test failed!")
-            sys.exit(99)
+            SysExit()
         PrintToLog("SmokeTest find some key problems!")
         PrintToLog("End of check, test failed!")
         sys.exit(98)
