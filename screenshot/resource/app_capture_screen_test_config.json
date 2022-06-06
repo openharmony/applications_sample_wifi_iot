@@ -1,6 +1,6 @@
 [
     {
-        "DEVICE_1":[2, 3, 4, 8],
+        "DEVICE_1":[1, 2, 3, 4, 8],
         "DEVICE_2":[5, 6, 7, 9],
         "return-x-y":[210, 1240],
         "recent-x-y":[515, 1240],
@@ -99,9 +99,10 @@
     {
         "app_name": "photos",
         "entry": "aa start -a com.ohos.photos.MainAbility -b com.ohos.photos",
+        "compress_log":["cd /data/log/hilog && tar -cf photos_log.tar *"],
         "all_actions": [
             [2, "permisson_ok-x-y"], [2, "permisson_ok-x-y"], [2, "permisson_ok-x-y"], [2, "shot_cmd"], [2, "recent-x-y"], [2, "recent_del-x-y"], [1, "cmp_cmd-level", 200000],
-            [2, "home-x-y"], [1, "recent-x-y"], [1, "recent_del-x-y"], [2, "home-x-y"]
+            [2, "shot_cmd", "photo_check"], [2, "recent-x-y"], [2, "recent_del-x-y"], [1, "stop_hilog"], [1, "compress_log"], [1, "get_file_from_dev", "/data/log/hilog/photos_log.tar"], [2, "home-x-y"]
         ]
     },
     {
