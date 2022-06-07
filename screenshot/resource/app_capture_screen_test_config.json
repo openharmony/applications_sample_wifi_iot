@@ -76,7 +76,7 @@
     {
         "app_name": "camera",
         "entry": "",
-        "check_result":["cd /data/log/hilog && grep -nr PreviewOutputCallback", "OnFrameStarted"],
+        "check_result":["cd /data/log/hilog && grep -nr PreviewOutputCallback", ""],
         "compress_log":["cd /data/log/hilog && tar -cf camera_log.tar *"],
         "close_auto_log":["hilog -w stop;rm /data/log/hilog/*"],
         "open_camera_log":["hilog -b X;hilog -b D -T CAMERA;hilog -r"],
