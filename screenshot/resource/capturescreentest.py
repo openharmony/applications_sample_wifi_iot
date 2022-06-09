@@ -323,10 +323,10 @@ if __name__ == "__main__":
                     ConnectToWifi(args.tools_path)
                 elif type(single_action[1]) == str and single_action[1] == 'log_packaging':
                     next_cmd = ""
-                    EnterShellCmd("cd /data/log/hilog && tar -cf photos_log_{}.tar *".format(3 - testcnt))
+                    EnterShellCmd("cd /data/log/hilog && tar -cf photos_log_{}.tar *".format(5 - testcnt))
                 elif type(single_action[1]) == str and single_action[1] == 'get_photos_log_from_dev':
                     next_cmd = ""
-                    EnterCmd("hdc_std -t {} file recv \"/data/log/hilog/photos_log_{}.tar\" \"{}\"".format(args.device_num, 3 - testcnt, os.path.normpath(args.save_path)))
+                    EnterCmd("hdc_std -t {} file recv \"/data/log/hilog/photos_log_{}.tar\" \"{}\"".format(args.device_num, 5 - testcnt, os.path.normpath(args.save_path)))
                 #process_crash_check
                 elif type(single_action[1]) == str and single_action[1] == 'process_crash_check':
                     next_cmd = ""
