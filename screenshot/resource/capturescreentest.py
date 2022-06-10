@@ -70,16 +70,16 @@ def EnterCmd(mycmd, waittime = 0, printresult = 1):
             cmd_file.close()
     return result
 
-def SysExit():
-    EnterShellCmd("cd /data/log/faultlog/temp && tar -cf after_test_crash_log_{}.tar cppcrash*".format(args.device_num))
-    GetFileFromDev("/data/log/faultlog/temp/after_test_crash_log_{}.tar".format(args.device_num), os.path.normpath(args.save_path))
-    sys.exit(99)
-
 def EnterShellCmd(shellcmd, waittime = 0, printresult = 1):
     if shellcmd == "":
         return
     cmd = "hdc_std -t {} shell \"{}\"".format(args.device_num, shellcmd)
     return EnterCmd(cmd, waittime, printresult)
+
+def SysExit():
+    EnterShellCmd("cd /data/log/faultlog/temp && tar -cf after_test_crash_log_{}.tar cppcrash*".format(args.device_num))
+    GetFileFromDev("/data/log/faultlog/temp/after_test_crash_log_{}.tar".format(args.device_num), os.path.normpath(args.save_path))
+    sys.exit(99)
 
 def SendFileToDev(src, dst):
     cmd = "hdc_std -t {} file send \"{}\" \"{}\"".format(args.device_num, src, dst)
@@ -173,7 +173,7 @@ if __name__ == "__main__":
         p = EnterShellCmd(cmp_launcher, 1)
         num = re.findall(r'[-+]?\d+', p)
         PrintToLog(num)
-        if type(num) == list and len(num) > 0 and int(num[0]) < 443200 and p.find('No such file or directory', 0, len(p)) == -1:
+        if type(num) == list and len(num) > 0 and int(num[0]) < 184320 and p.find('No such file or directory', 0, len(p)) == -1:
             PrintToLog("remove lock is ok!\n\n")
             break
         elif rebootcnt >= 1:
@@ -431,6 +431,14 @@ if __name__ == "__main__":
 
     EnterShellCmd("cd /data/log/faultlog/temp && tar -cf after_test_crash_log_{}.tar cppcrash*".format(args.device_num))
     GetFileFromDev("/data/log/faultlog/temp/after_test_crash_log_{}.tar".format(args.device_num), os.path.normpath(args.save_path))
+    crash_cnt = EnterShellCmd("cd /data/log/faultlog/temp && find . -name cppcrash*", 2)
+    result = "".join(crash_cnt)
+    findsome = result.find("cppcrash", 0, len(result))
+    if findsome != -1:
+        PrintToLog("ERROR:find cppcrash !\n")
+        PrintToLog("SmokeTest find some fatal problems!")
+        PrintToLog("End of check, test failed!")
+        SysExit()
     if len(fail_idx_list) != 0:
         PrintToLog("ERROR: name {}, index {}, these testcase is failed".format(fail_name_list, fail_idx_list))
         if fail_name_list.count('launcher') or fail_name_list.count('settings_keyboard'):

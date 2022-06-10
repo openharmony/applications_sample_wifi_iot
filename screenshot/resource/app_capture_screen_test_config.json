@@ -58,7 +58,7 @@
           [1,"close_auto_log"], [1,"start_video_log"], [2, "install_hap", "vediotest/ActsVideoPlayerJsTest.hap"], [1, "mk_test_dir"], [1, "remount"], 
           [1, "send_file_to_dev", "vediotest/H264_AAC.mp4", "/data/app/el1/bundle/public/ohos.acts.multimedia.video.videoplayer/ohos.acts.multimedia.video.videoplayer/assets/entry/resources/rawfile/"],
           [15, "start_test"], [1, "recover_log"], [1, "stop_hilog"], [1, "check_result"], [1, "compress_log"],
-          [1, "get_file_from_dev", "/data/log/hilog/video_log.tar"], [2, "recent-x-y"], [2, "recent_del-x-y"], [2, "home-x-y"], [2, "recent-x-y"], [2, "recent_del-x-y"], [2, "home-x-y"]
+          [1, "get_file_from_dev", "/data/log/hilog/video_log.tar"], [2, "recent-x-y"], [2, "recent_del-x-y"], [2, "home-x-y"], [2, "recent-x-y"], [2, "recent_del-x-y"]
         ]
     },
     {
@@ -76,7 +76,7 @@
     {
         "app_name": "camera",
         "entry": "",
-        "check_result":["cd /data/log/hilog && grep -nr PreviewOutputCallback", ""],
+        "check_result":["cd /data/log/hilog && grep -nr PreviewOutputCallback", "OnFrameStarted"],
         "compress_log":["cd /data/log/hilog && tar -cf camera_log.tar *"],
         "close_auto_log":["hilog -w stop;rm /data/log/hilog/*"],
         "open_camera_log":["hilog -b X;hilog -b D -T CAMERA;hilog -r"],
@@ -84,7 +84,7 @@
         "recover_log":["cd data/log/hilog/;hilog -x > camera_log.txt;hilog -b D"],
         "all_actions": [
             [1, "close_auto_log"], [1, "open_camera_log"], [5, "start_camera"], [2, "permisson_ok-x-y"], [2, "permisson_ok-x-y"], [2, "permisson_ok-x-y"], [2, "permisson_ok-x-y"], [2, "permisson_ok-x-y"], [2, "permisson_ok-x-y"], [1, "recover_log"], [1, "check_result"],
-            [1, "shot_cmd"], [2, "recent-x-y"], [2, "recent_del-x-y"], [1, "compress_log"], [1, "get_file_from_dev", "/data/log/hilog/camera_log.tar"], [2, "home-x-y"], [2, "home-x-y"]
+            [1, "shot_cmd"], [2, "recent-x-y"], [2, "recent_del-x-y"], [1, "compress_log"], [1, "get_file_from_dev", "/data/log/hilog/camera_log.tar"]
         ]
     },
     {
@@ -93,7 +93,7 @@
         "compress_log":["cd /data/log/hilog && tar -cf settings_log.tar *"],
         "all_actions": [
             [2, "shot_cmd", "settings"], [1, "cmp_cmd-level"], [2, "recent-x-y"], [2, "recent_del-x-y"], [2, "home-x-y"], [2, "recent-x-y"], [2, "recent_del-x-y"], [1, "stop_hilog"],
-            [1, "compress_log"], [1, "get_file_from_dev", "/data/log/hilog/settings_log.tar"], [2, "home-x-y"]
+            [1, "compress_log"], [1, "get_file_from_dev", "/data/log/hilog/settings_log.tar"]
         ]
     },
     {
@@ -101,8 +101,8 @@
         "entry": "aa start -a com.ohos.photos.MainAbility -b com.ohos.photos",
         "compress_log":["cd /data/log/hilog && tar -cf photos_log.tar *"],
         "all_actions": [
-            [2, "permisson_ok-x-y"], [2, "permisson_ok-x-y"], [2, "permisson_ok-x-y"], [2, 550, 700], [2, 550, 700], [2, 550, 700], [2, "shot_cmd"], [2, "recent-x-y"], [2, "recent_del-x-y"],
-            [2, "shot_cmd", "photo_check"], [2, "recent-x-y"], [2, "recent_del-x-y"], [1, "stop_hilog"], [1, "log_packaging"], [1, "get_photos_log_from_dev"], [2, "home-x-y"]
+            [2, "shot_cmd", "photo_check_1"], [2, "permisson_ok-x-y"], [2, "shot_cmd", "photo_check_2"], [2, "permisson_ok-x-y"], [2, "shot_cmd", "photo_check_3"], [2, "permisson_ok-x-y"], [2, "shot_cmd"], [2, "recent-x-y"], [2, "shot_cmd", "photo_check_4"], [2, "recent_del-x-y"], [2, "cmp_cmd-level"],
+            [2, "shot_cmd", "photo_check_5"], [2, "recent-x-y"], [2, "recent_del-x-y"], [1, "stop_hilog"], [1, "compress_log"], [1, "get_file_from_dev", "/data/log/hilog/photos_log.tar"]
         ]
     },
     {
@@ -111,7 +111,7 @@
         "compress_log":["cd /data/log/hilog && tar -cf note_log.tar *"],
         "all_actions": [
             [2, "permisson_ok-x-y"], [2, "permisson_ok-x-y"], [2, "permisson_ok-x-y"], [2, "permisson_ok-x-y"], [2, "permisson_ok-x-y"], [2, "shot_cmd"], [2, "recent-x-y"], [2, "recent_del-x-y"], [2, "home-x-y"],
-            [2, "recent-x-y"], [2, "recent_del-x-y"], [1, "cmp_cmd-level"], [1, "stop_hilog"], [1, "compress_log"], [1, "get_file_from_dev", "/data/log/hilog/note_log.tar"], [2, "home-x-y"]
+            [2, "recent-x-y"], [2, "recent_del-x-y"], [1, "cmp_cmd-level"], [1, "stop_hilog"], [1, "compress_log"], [1, "get_file_from_dev", "/data/log/hilog/note_log.tar"]
         ]
     }
 ]
