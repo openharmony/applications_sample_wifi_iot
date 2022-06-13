@@ -66,7 +66,7 @@
         "entry": "",
         "remount":["mount -o rw,remount /"],
         "chmodfile1":["chmod 777 /data/audio_renderer_unit_test"],
-        "audio_render_test":["cd /data && ./audio_renderer_unit_test && rm *.xml", "[  PASSED  ] 1 test"],
+        "audio_render_test":["cd /data && ./audio_renderer_unit_test --gtest_filter=AudioRendererUnitTest.Audio_Renderer_Playback_001 && rm *.xml", "[  PASSED  ] 1 test"],
         "compress_log":["cd /data/log/hilog && tar -cf audio_render_log.tar *"],
         "all_actions": [
             [1, "remount"], [1, "send_file_to_dev", "audiotest/audio_renderer_unit_test", "/data/"], [1, "send_file_to_dev", "audiotest/test_44100_2.wav", "/data/"], [2, "chmodfile1"],
