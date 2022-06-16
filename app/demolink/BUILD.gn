@@ -12,10 +12,11 @@
 # limitations under the License.
 
 static_library("example_demolink") {
-  sources = [ "helloworld.c" ]
-
-  include_dirs = [
-    "//utils/native/lite/include",
-    "//domains/iot/link/libbuild",
+  sources = [
+    "demosdk.c",
+    "demosdk_adapter.c",
+    "helloworld.c",
   ]
+
+  include_dirs = [ "//utils/native/lite/include" ]
 }
