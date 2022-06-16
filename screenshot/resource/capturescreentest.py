@@ -147,7 +147,7 @@ if __name__ == "__main__":
 
     cmp_status = 0
     global_pos = all_app[0]
-
+    
     #rmlock
     rebootcnt = 2
     while rebootcnt:
@@ -249,10 +249,10 @@ if __name__ == "__main__":
         with open(os.path.join(args.save_path, 'shot_test_{}.bat'.format(args.device_num)), mode='a', encoding='utf-8') as cmd_file:
             cmd_file.write("\n\n::::::case {} --- {} test start \n".format(idx, single_app['app_name']))
         cmd_file.close()
-        testcnt = 5
+        testcnt = 3
         while testcnt:
             testok = 0
-            if testcnt != 5:
+            if testcnt != 3:
                 PrintToLog(">>>>>>>>>>>>>>>>>>>>>>>Try again:\n")
                 with open(os.path.join(args.save_path, 'shot_test_{}.bat'.format(args.device_num)), mode='a', encoding='utf-8') as cmd_file:
                     cmd_file.write("\n::::::Last failed, Try again \n")
@@ -272,9 +272,9 @@ if __name__ == "__main__":
                     else:
                         pic_name = "{}{}".format(single_app['app_name'], ".png")
                         raw_pic_name = single_app['app_name'] + ".pngraw"
-                    EnterShellCmd("rm /data/screen_test/{}_{}*".format(6 - testcnt, pic_name), 1)
-                    EnterShellCmd(capture_screen_cmd.format(6 - testcnt, pic_name), 1)
-                    GetFileFromDev("/data/screen_test/{}_{}".format(6 - testcnt, pic_name), args.save_path)
+                    EnterShellCmd("rm /data/screen_test/{}_{}*".format(4 - testcnt, pic_name), 1)
+                    EnterShellCmd(capture_screen_cmd.format(4 - testcnt, pic_name), 1)
+                    GetFileFromDev("/data/screen_test/{}_{}".format(4 - testcnt, pic_name), args.save_path)
                     next_cmd = ""
                 #cmp_cmd-level is stable, different to other cmd,so handle it specialy
                 elif type(single_action[1]) == str and single_action[1] == 'cmp_cmd-level':
@@ -282,7 +282,7 @@ if __name__ == "__main__":
                     sys.stdout.flush()
                     EnterShellCmd("rm /data/train_set/{}".format(raw_pic_name), 1)
                     SendFileToDev(os.path.normpath(os.path.join(args.anwser_path, raw_pic_name)), "/data/screen_test/train_set")
-                    new_cmp_cmd = cmp_cmd.format(6 - testcnt, raw_pic_name, raw_pic_name)
+                    new_cmp_cmd = cmp_cmd.format(4 - testcnt, raw_pic_name, raw_pic_name)
                     if len(single_action) == 3:
                         tolerance = single_action[2]
                     else:
@@ -301,8 +301,8 @@ if __name__ == "__main__":
                         PrintToLog("{} screenshot check is abnarmal!\n\n".format(raw_pic_name))
                     sys.stdout.flush()
                     if testok == 1 or testcnt == 1 or smoke_first_failed != '':
-                        old_name = os.path.normpath(os.path.join(args.save_path, "{}_{}".format(6 - testcnt, pic_name)))
-                        GetFileFromDev("/data/screen_test/{}_{}".format(6 - testcnt, raw_pic_name), args.save_path)
+                        old_name = os.path.normpath(os.path.join(args.save_path, "{}_{}".format(4 - testcnt, pic_name)))
+                        GetFileFromDev("/data/screen_test/{}_{}".format(4 - testcnt, raw_pic_name), args.save_path)
                         os.system("rename {} {}".format(old_name, pic_name))
                         os.system("rename {}raw {}raw".format(old_name, pic_name))
                     raw_pic_name = ''
@@ -323,10 +323,10 @@ if __name__ == "__main__":
                     ConnectToWifi(args.tools_path)
                 elif type(single_action[1]) == str and single_action[1] == 'log_packaging':
                     next_cmd = ""
-                    EnterShellCmd("cd /data/log/hilog && tar -cf photos_log_{}.tar *".format(5 - testcnt))
+                    EnterShellCmd("cd /data/log/hilog && tar -cf photos_log_{}.tar *".format(4 - testcnt))
                 elif type(single_action[1]) == str and single_action[1] == 'get_photos_log_from_dev':
                     next_cmd = ""
-                    EnterCmd("hdc_std -t {} file recv \"/data/log/hilog/photos_log_{}.tar\" \"{}\"".format(args.device_num, 5 - testcnt, os.path.normpath(args.save_path)))
+                    EnterCmd("hdc_std -t {} file recv \"/data/log/hilog/photos_log_{}.tar\" \"{}\"".format(args.device_num, 4 - testcnt, os.path.normpath(args.save_path)))
                 #process_crash_check
                 elif type(single_action[1]) == str and single_action[1] == 'process_crash_check':
                     next_cmd = ""
@@ -336,13 +336,13 @@ if __name__ == "__main__":
                         findsome = result.find(single_action[2], 0, len(result))
                         if findsome != -1:
                             testok = -1
-                            PrintToLog("\"{}\" ERROR:find crux crash \"{}\"!\n".format(single_action[1], single_action[2]))
+                            PrintToLog("\"{}\" ERROR:find fatal crash \"{}\"!\n".format(single_action[1], single_action[2]))
                             PrintToLog("SmokeTest find some fatal problems!")
                             PrintToLog("End of check, test failed!")
                             SysExit()
                         else:
                             testok = 1
-                            PrintToLog("\"{}\" check execut result is ok, not find crux crash \"{}\"!\n".format(single_action[1], single_action[2]))
+                            PrintToLog("\"{}\" check execut result is ok, not find fatal crash \"{}\"!\n".format(single_action[1], single_action[2]))
                         sys.stdout.flush()
                 #other cmd handle
                 elif type(single_action[1]) == str:
@@ -433,16 +433,42 @@ if __name__ == "__main__":
     GetFileFromDev("/data/log/faultlog/temp/after_test_crash_log_{}.tar".format(args.device_num), os.path.normpath(args.save_path))
     EnterShellCmd("cd /data/log/faultlog/temp && find . -name cppcrash*", 2)
     EnterShellCmd("cd /data/log/faultlog/temp && grep \"Process name\" -rnw ./", 2)
+
+    fail_str_list = [str(x) for x in fail_idx_list]
+    reboot_test_num = " ".join(fail_str_list)
+    print(fail_str_list)
     if len(fail_idx_list) != 0:
-        PrintToLog("ERROR: name {}, index {}, these testcase is failed".format(fail_name_list, fail_idx_list))
-        if fail_name_list.count('launcher') or fail_name_list.count('settings_keyboard'):
-            PrintToLog("SmokeTest find some fatal problems!")
+        with open(os.path.normpath(os.path.join(args.tools_path, "reboot.txt")), mode='a+') as f:
+            f.seek(0)
+            reboot_result = f.read()
+        f.close()
+        if len(reboot_result) < 1:
+            os.system("mkdir {}\\reboot".format(args.save_path))
+            with open(os.path.normpath(os.path.join(args.tools_path, "reboot.txt")), mode='w') as f:
+                f.write("reboot")
+            f.close()
+            PrintToLog("ERROR: name {}, index {}, these testcase is failed, reboot and try!!".format(fail_name_list, fail_idx_list))
+            EnterShellCmd("rm -rf /data/*;reboot")
+            reboot_result_list = EnterCmd("hdc_std list targets", 2)
+            number = 0
+            while "7001005458323933328a" not in reboot_result_list and number < 15:
+                reboot_result_list = EnterCmd("hdc_std list targets", 2)
+                number += 1
+            EnterShellCmd("rm /data/log/hilog/*;hilog -r;hilog -w start -l 400000000 -m none", 1)
+            py_cmd = os.system("python {}\\resource\\capturescreentest.py --config {}\\resource\\app_capture_screen_test_config.json --anwser_path {} --save_path {}\\reboot --tools_path {} --test_num \"{}\"".format(args.tools_path, args.tools_path, args.anwser_path, args.save_path, args.tools_path, reboot_test_num))
+            if py_cmd == 0:
+                sys.exit(0)
+            elif py_cmd == 98:
+                sys.exit(98)
+            else:
+                sys.exit(99)
+        else:
+            PrintToLog("ERROR: name {}, index {}, these testcase is failed".format(fail_name_list, fail_idx_list))
+            PrintToLog("SmokeTest find some key problems!")
             PrintToLog("End of check, test failed!")
-            SysExit()
-        PrintToLog("SmokeTest find some key problems!")
-        PrintToLog("End of check, test failed!")
-        sys.exit(98)
+            sys.exit(98)
     else:
         PrintToLog("All testcase is ok")
         PrintToLog("End of check, test succeeded!")
         sys.exit(0)
+

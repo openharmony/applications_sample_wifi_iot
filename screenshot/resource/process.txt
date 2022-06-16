@@ -51,7 +51,6 @@ usb_service
 camera_service
 thermal
 foundation
-accesstoken_ser
 hdcd
 disp_gralloc_host
 light_dal_host
