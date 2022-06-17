@@ -431,14 +431,8 @@ if __name__ == "__main__":
 
     EnterShellCmd("cd /data/log/faultlog/temp && tar -cf after_test_crash_log_{}.tar cppcrash*".format(args.device_num))
     GetFileFromDev("/data/log/faultlog/temp/after_test_crash_log_{}.tar".format(args.device_num), os.path.normpath(args.save_path))
-    crash_cnt = EnterShellCmd("cd /data/log/faultlog/temp && find . -name cppcrash*", 2)
-    result = "".join(crash_cnt)
-    findsome = result.find("cppcrash", 0, len(result))
-    if findsome != -1:
-        PrintToLog("ERROR:find cppcrash !\n")
-        PrintToLog("SmokeTest find some fatal problems!")
-        PrintToLog("End of check, test failed!")
-        SysExit()
+    EnterShellCmd("cd /data/log/faultlog/temp && find . -name cppcrash*", 2)
+    EnterShellCmd("cd /data/log/faultlog/temp && grep \"Process name\" -rnw ./", 2)
     if len(fail_idx_list) != 0:
         PrintToLog("ERROR: name {}, index {}, these testcase is failed".format(fail_name_list, fail_idx_list))
         if fail_name_list.count('launcher') or fail_name_list.count('settings_keyboard'):
