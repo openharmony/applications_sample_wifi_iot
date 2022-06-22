@@ -53,9 +53,9 @@ thermal
 foundation
 hdcd
 disp_gralloc_host
-light_dal_host
-vibrator_dal_host
-sensor_dal_host
+light_host
+vibrator_host
+sensor_host
 input_user_host
 camera_host
 audio_hdi_server_host
