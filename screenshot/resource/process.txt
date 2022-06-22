@@ -26,7 +26,6 @@ audio_policy
 deviceauth_service
 softbus_server
 wifi_hal_service
-deviceinfoservi
 faultloggerd
 accountmgr
 time_service
