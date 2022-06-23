@@ -20,7 +20,6 @@ pulseaudio
 accessibility
 resource_schedu
 faceauth
-work_scheduler_
 bgtaskmgr_servi
 audio_policy
 deviceauth_service
