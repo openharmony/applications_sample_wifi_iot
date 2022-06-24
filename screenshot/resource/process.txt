@@ -1,5 +1,5 @@
 ####First_check_at_begin__Second_check_at_end__Two_results_must_be_same#####
-com.ohos.launcher:extension
+com.ohos.launcher
 render_service
 
 ####only_check_these_processes_are_exitst#####
@@ -62,7 +62,6 @@ usbfnMaster_host
 usb_host
 blue_host
 wifi_hal_service
-com.ohos.systemui:extension
+com.ohos.systemui
 device_usage_st
 power_host
-
