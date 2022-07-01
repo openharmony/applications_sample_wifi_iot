@@ -173,28 +173,28 @@ if __name__ == "__main__":
     target_dir = os.path.normpath(os.path.join(args.archive_path, "system"))
     PrintToLog(target_dir)
     ret_size = GetDirSize(target_dir)/1024/1024
-    if ret_size > 150:
+    if ret_size > 50:
         PrintToLog('ERROR: Size of system({:.2f}M) is over the upper limit(50M)'.format(ret_size))
         PrintToLog("End of check, test failed!")
         sys.exit(99)
 
     target_dir = os.path.normpath(os.path.join(args.archive_path, "data"))
     ret_size = GetDirSize(target_dir)/1024/1024
-    if ret_size > 150:
+    if ret_size > 50:
         PrintToLog('ERROR: Size of data({:.2f}M) is over the upper limit(50M)'.format(ret_size))
         PrintToLog("End of check, test failed!")
         sys.exit(99)
 
     target_dir = os.path.normpath(os.path.join(args.archive_path, "updater"))
     ret_size = GetDirSize(target_dir)/1024/1024
-    if ret_size > 150:
+    if ret_size > 50:
         PrintToLog('ERROR: Size of updater({:.2f}M) is over the upper limit(50M)'.format(ret_size))
         PrintToLog("End of check, test failed!")
         sys.exit(99)
 
     target_dir = os.path.normpath(os.path.join(args.archive_path, "vendor"))
     ret_size = GetDirSize(target_dir)/1024/1024
-    if ret_size > 150:
+    if ret_size > 50:
         PrintToLog('ERROR: Size of vendor({:.2f}M) is over the upper limit(50M)'.format(ret_size))
         PrintToLog("End of check, test failed!")
         sys.exit(99)
