@@ -89,6 +89,17 @@ def GetFileFromDev(src, dst):
     cmd = "hdc_std -t {} file recv \"{}\" \"{}\"".format(args.device_num, src, dst)
     return EnterCmd(cmd, 1, 1)
 
+def connection_judgment():
+    connection_status = EnterCmd("hdc_std list targets", 2)
+    connection_cnt = 0
+    while "7001005458323933328a" not in connection_status and connection_cnt < 15:
+        connection_status = EnterCmd("hdc_std list targets", 2)
+        connection_cnt += 1
+    if connection_cnt == 15:
+        PrintToLog("Device disconnection!!")
+        PrintToLog("End of check, test failed!")
+        sys.exit(101)
+
 def ConnectToWifi(tools_path):
     EnterShellCmd("mkdir /data/l2tool", 1)
     SendFileToDev(os.path.normpath(os.path.join(tools_path, "l2tool/busybox")), "/data/l2tool/")
@@ -147,7 +158,7 @@ if __name__ == "__main__":
 
     cmp_status = 0
     global_pos = all_app[0]
-    
+
     #rmlock
     rebootcnt = 2
     while rebootcnt:
@@ -169,6 +180,7 @@ if __name__ == "__main__":
         EnterShellCmd("/data/screen_test/printscreen -f /data/screen_test/launcher_{}.png".format(args.device_num), 1)
         GetFileFromDev("/data/screen_test/launcher_{}.pngraw".format(args.device_num), args.save_path)
         GetFileFromDev("/data/screen_test/launcher_{}.png".format(args.device_num), args.save_path)
+        connection_judgment()
         cmp_launcher = "cmp -l /data/screen_test/launcher_{}.pngraw /data/screen_test/train_set/launcher.pngraw | wc -l".format(args.device_num)
         p = EnterShellCmd(cmp_launcher, 1)
         num = re.findall(r'[-+]?\d+', p)
@@ -321,12 +333,6 @@ if __name__ == "__main__":
                 elif type(single_action[1]) == str and single_action[1] == 'connect_wifi':
                     next_cmd = ""
                     ConnectToWifi(args.tools_path)
-                elif type(single_action[1]) == str and single_action[1] == 'log_packaging':
-                    next_cmd = ""
-                    EnterShellCmd("cd /data/log/hilog && tar -cf photos_log_{}.tar *".format(4 - testcnt))
-                elif type(single_action[1]) == str and single_action[1] == 'get_photos_log_from_dev':
-                    next_cmd = ""
-                    EnterCmd("hdc_std -t {} file recv \"/data/log/hilog/photos_log_{}.tar\" \"{}\"".format(args.device_num, 4 - testcnt, os.path.normpath(args.save_path)))
                 #process_crash_check
                 elif type(single_action[1]) == str and single_action[1] == 'process_crash_check':
                     next_cmd = ""
@@ -391,6 +397,7 @@ if __name__ == "__main__":
             else:
                 testcnt = 0
             EnterShellCmd("hilog -w stop", 1)
+            connection_judgment()
         if smoke_first_failed == 'launcher':
             break
     
@@ -460,8 +467,10 @@ if __name__ == "__main__":
                 sys.exit(0)
             elif py_cmd == 98:
                 sys.exit(98)
-            else:
+            elif py_cmd == 99:
                 sys.exit(99)
+            else:
+                sys.exit(101)
         else:
             PrintToLog("ERROR: name {}, index {}, these testcase is failed".format(fail_name_list, fail_idx_list))
             PrintToLog("SmokeTest find some key problems!")
@@ -471,4 +480,3 @@ if __name__ == "__main__":
         PrintToLog("All testcase is ok")
         PrintToLog("End of check, test succeeded!")
         sys.exit(0)
-

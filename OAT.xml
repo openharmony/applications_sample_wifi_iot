@@ -27,19 +27,19 @@
         <filefilterlist>
             <filefilter name="defaultFilter" desc="Files not to check">
                 <filteritem type="filename" name="*.png|*.pngraw|*.json" desc="Test files"/>
-                <filteritem type="filename" name="printscreen|*.hap|audio_renderer_unit_test" desc="Test files"/>
+                <filteritem type="filename" name="printscreen|*.hap|audio_renderer_unit_test|NativeRdbTest" desc="Test files"/>
             </filefilter>
             <filefilter name="defaultPolicyFilter" desc="Filters for compatibility，license header policies">
                 <filteritem type="filename" name="*.png|*.pngraw|*.json|dhcpc.sh" desc="NoLicenseHeader"/>
-                <filteritem type="filename" name="printscreen|*.hap|audio_renderer_unit_test" desc="NoLicenseHeader"/>
+                <filteritem type="filename" name="printscreen|*.hap|audio_renderer_unit_test|NativeRdbTest" desc="NoLicenseHeader"/>
             </filefilter>
             <filefilter name="copyrightPolicyFilter" desc="Filters for copyright header policies">
                 <filteritem type="filename" name="*.png|*.pngraw|*.json|dhcpc.sh" desc="InvalidCopyright file"/>
-                <filteritem type="filename" name="printscreen|*.hap|audio_renderer_unit_test" desc="InvalidCopyright file"/>
+                <filteritem type="filename" name="printscreen|*.hap|audio_renderer_unit_test|NativeRdbTest" desc="InvalidCopyright file"/>
             </filefilter>
             <filefilter name="binaryFileTypePolicyFilter" desc="Filters for binary file policies">
                 <filteritem type="filename" name="*.png|*.pngraw|*.json|busybox" desc="already checked"/>
-                <filteritem type="filename" name="printscreen|*.hap|audio_renderer_unit_test" desc="already checked"/>
+                <filteritem type="filename" name="printscreen|*.hap|audio_renderer_unit_test|NativeRdbTest" desc="already checked"/>
             </filefilter>
         </filefilterlist>
     </oatconfig>
