@@ -140,13 +140,15 @@ if __name__ == "__main__":
 
     target_dir = os.path.normpath(os.path.join(args.archive_path, "rootfs"))
     ret_size = GetDirSize(target_dir)/1024/1024
+    PrintToLog('Size of rootfs is ({:.2f}M)'.format(ret_size))
     if ret_size > 15:
         PrintToLog('ERROR: Size of rootfs({:.2f}M) is over the upper limit(15M)'.format(ret_size))
         PrintToLog("End of check, test failed!")
         sys.exit(99)
 
-    target_dir = os.path.normpath(os.path.join(args.archive_path, "rootfs"))
+    target_dir = os.path.normpath(os.path.join(args.archive_path, "userfs"))
     ret_size = GetDirSize(target_dir)/1024/1024
+    PrintToLog('Size of userfs is ({:.2f}M)'.format(ret_size))
     if ret_size > 15:
         PrintToLog('ERROR: Size of userfs({:.2f}M) is over the upper limit(15M)'.format(ret_size))
         PrintToLog("End of check, test failed!")
