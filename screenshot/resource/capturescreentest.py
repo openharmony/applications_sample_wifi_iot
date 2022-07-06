@@ -190,7 +190,7 @@ if __name__ == "__main__":
             break
         elif rebootcnt >= 1:
             PrintToLog("remove lock failed, reboot and try!!!\n\n")
-            EnterShellCmd("reboot")
+            EnterShellCmd("rm -rf /data/*;reboot")
             for i in range(5):
                 EnterCmd("hdc_std list targets", 10)
         else:
@@ -462,7 +462,7 @@ if __name__ == "__main__":
                 reboot_result_list = EnterCmd("hdc_std list targets", 2)
                 number += 1
             EnterShellCmd("rm /data/log/hilog/*;hilog -r;hilog -w start -l 400000000 -m none", 1)
-            py_cmd = os.system("python {}\\resource\\capturescreentest.py --config {}\\resource\\app_capture_screen_test_config.json --anwser_path {} --save_path {}\\reboot --tools_path {} --test_num \"{}\"".format(args.tools_path, args.tools_path, args.anwser_path, args.save_path, args.tools_path, reboot_test_num))
+            py_cmd = os.system("python {}\\resource\\capturescreentest.py --config {}\\resource\\app_capture_screen_test_config.json --anwser_path {} --save_path {}\\reboot --tools_path {} --device_num {} --test_num \"{}\"".format(args.tools_path, args.tools_path, args.anwser_path, args.save_path, args.tools_path, args.device_num, reboot_test_num))
             if py_cmd == 0:
                 sys.exit(0)
             elif py_cmd == 98:
