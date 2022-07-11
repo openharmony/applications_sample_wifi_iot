@@ -37,7 +37,6 @@ fms_service
 distributedfile
 netmanager
 battery_stats
-dslm_service
 sensors
 media_service
 wifi_manager_se
