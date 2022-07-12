@@ -449,7 +449,7 @@ if __name__ == "__main__":
             f.seek(0)
             reboot_result = f.read()
         f.close()
-        if len(reboot_result) < 1:
+        if len(reboot_result) < 1 and rebootcnt >= 1:
             os.system("mkdir {}\\reboot".format(args.save_path))
             with open(os.path.normpath(os.path.join(args.tools_path, "reboot.txt")), mode='w') as f:
                 f.write("reboot")
