@@ -1,7 +1,7 @@
 [
     {
         "DEVICE_1":[1, 2, 3, 4, 6],
-        "DEVICE_2":[5, 7, 8, 10, 11],
+        "DEVICE_2":[5, 7, 9, 10],
         "return-x-y":[210, 1240],
         "recent-x-y":[515, 1240],
         "home-x-y":[360, 1240],
@@ -95,20 +95,12 @@
         "open_camera_log":["hilog -b X;hilog -b D -T CAMERA;hilog -r"],
         "start_camera":["aa start -a com.ohos.camera.MainAbility -b com.ohos.camera"],
         "recover_log":["cd data/log/hilog/;hilog -x > camera_log.txt;hilog -b D"],
-        "all_actions": [
-            [1, "close_auto_log"], [1, "open_camera_log"], [5, "start_camera"], [2, "permisson_ok-x-y"], [2, "permisson_ok-x-y"], [2, "permisson_ok-x-y"], [2, "permisson_ok-x-y"], [2, "permisson_ok-x-y"], [2, "permisson_ok-x-y"],
-            [1, "recover_log"], [1, "check_result"], [1, "shot_cmd"], [2, "recent-x-y"], [2, "recent_del-x-y"], [1, "compress_log"], [1, "get_file_from_dev", "/data/log/hilog/camera_log.tar"]
-        ]
-    },
-    {
-        "app_name": "photograph",
-        "entry": "aa start -a com.ohos.camera.MainAbility -b com.ohos.camera",
-        "compress_log":["cd /data/log/hilog && tar -cf photograph_log.tar *"],
         "chmodfile":["chmod 777 /data/NativeRdbTest"],
         "start_photographtest":["cd /data && ./NativeRdbTest --gtest_filter=RdbStoreInsertTest.RdbStore_Insert_001 && rm *.xml", "[  PASSED  ] 1 test"],
         "all_actions": [
-            [2, "permisson_ok-x-y"], [2, "permisson_ok-x-y"], [2, "permisson_ok-x-y"], [2, "permisson_ok-x-y"], [2, "permisson_ok-x-y"], [2, "permisson_ok-x-y"], [2, "take_photos-x-y"], [2, "take_photos-x-y"], [1, "remount"], [1, "send_file_to_dev", "photographtest/NativeRdbTest", "/data/"], [2, "chmodfile"], [2, "start_photographtest"], [2, "recent-x-y"], [2, "recent_del-x-y"],
-            [1, "stop_hilog"], [1, "compress_log"],[1, "get_file_from_dev", "/data/log/hilog/photograph_log.tar"]
+            [1, "close_auto_log"], [1, "open_camera_log"], [5, "start_camera"], [2, "permisson_ok-x-y"], [2, "permisson_ok-x-y"], [2, "permisson_ok-x-y"], [2, "permisson_ok-x-y"], [2, "permisson_ok-x-y"], [2, "permisson_ok-x-y"],
+            [2, "take_photos-x-y"], [2, "take_photos-x-y"], [1, "remount"], [1, "send_file_to_dev", "photographtest/NativeRdbTest", "/data/"], [2, "chmodfile"],
+            [1, "recover_log"], [1, "check_result"], [1, "shot_cmd"], [2, "start_photographtest"], [2, "recent-x-y"], [2, "recent_del-x-y"], [1, "compress_log"], [1, "get_file_from_dev", "/data/log/hilog/camera_log.tar"]
         ]
     },
     {
