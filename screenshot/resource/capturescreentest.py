@@ -264,6 +264,7 @@ if __name__ == "__main__":
         testcnt = 3
         while testcnt:
             testok = 0
+            checkok = 1
             if testcnt != 3:
                 PrintToLog(">>>>>>>>>>>>>>>>>>>>>>>Try again:\n")
                 with open(os.path.join(args.save_path, 'shot_test_{}.bat'.format(args.device_num)), mode='a', encoding='utf-8') as cmd_file:
@@ -333,6 +334,19 @@ if __name__ == "__main__":
                 elif type(single_action[1]) == str and single_action[1] == 'connect_wifi':
                     next_cmd = ""
                     ConnectToWifi(args.tools_path)
+                elif type(single_action[1]) == str and single_action[1] == 'process_check':
+                    next_cmd = ""
+                    if len(single_action) == 3:
+                        p = EnterShellCmd("ps -elf", single_action[0])
+                        result = "".join(p)
+                        findsome = result.find(single_action[2], 0, len(result))
+                        if findsome != -1:
+                            checkok = 1
+                            PrintToLog("\"{}\" check execut result is ok, find process \"{}\"!\n".format(single_action[1], single_action[2]))
+                        else:
+                            checkok = -1
+                            PrintToLog("\"{}\" check execut result is not ok, not find process \"{}\"!\n".format(single_action[1], single_action[2]))
+                        sys.stdout.flush()
                 #process_crash_check
                 elif type(single_action[1]) == str and single_action[1] == 'process_crash_check':
                     next_cmd = ""
@@ -378,9 +392,16 @@ if __name__ == "__main__":
                     next_cmd = "uinput -M -m {} {} -c 0".format(single_action[1], single_action[2])
                 EnterShellCmd(next_cmd, single_action[0])
 
-            if testok == 1:
+            if testok == 1 and checkok == 1:
                 PrintToLog("testcase {}, {} is ok!\n\n".format(idx, single_app['app_name']))
                 testcnt = 0
+            elif testok == 1 and checkok == -1:
+                if testcnt == 1:
+                    fail_idx_list.append(idx)
+                    fail_name_list.append(single_app['app_name'])
+                    smoke_first_failed = single_app['app_name']
+                    PrintToLog("ERROR:testcase {}, {} is failed!\n\n".format(idx, single_app['app_name']))
+                testcnt -= 1
             elif testok == -1 and smoke_first_failed == '':
                 #PrintToLog("ERROR:testcase {}, {} is failed!\n\n".format(idx, single_app['app_name']))
                 if testcnt == 1:
@@ -400,7 +421,18 @@ if __name__ == "__main__":
             connection_judgment()
         if smoke_first_failed == 'launcher':
             break
-    
+
+    medialibrarydata_pidnum = EnterShellCmd("pgrep -f com.ohos.medialibrary.medialibrarydata", 1)
+    medialibrarydata_pidnum = medialibrarydata_pidnum.strip()
+    sandbox_file = EnterShellCmd("nsenter -t {} -m sh;cd /storage/media/100/local/;ls;exit".format(medialibrarydata_pidnum), 1)
+    if "files" not in sandbox_file:
+        PrintToLog("Error: can not find sandbox path : /storage/media/100/local/files")
+        PrintToLog("SmokeTest find some fatal problems!")
+        PrintToLog("End of check, test failed!")
+        SysExit()
+    else:
+        PrintToLog("success: find sandbox path : /storage/media/100/local/files")
+
     #key processes second check, and cmp to first check
     PrintToLog("\n\n########## Second check key processes start ##############")
     second_check_lose_process = []
