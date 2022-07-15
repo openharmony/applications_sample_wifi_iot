@@ -19,7 +19,6 @@ bluetooth_servi
 pulseaudio
 accessibility
 resource_schedu
-faceauth
 bgtaskmgr_servi
 audio_policy
 deviceauth_service
