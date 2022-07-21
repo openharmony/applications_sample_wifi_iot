@@ -27,10 +27,10 @@ static_library("example_samgr") {
   include_dirs = [
     "//utils/native/lite/include",
     "//kernel/liteos_m/components/cmsis",
-    "//foundation/distributedschedule/samgr_lite/interfaces/kits/samgr",
-    "//foundation/distributedschedule/samgr_lite/interfaces/kits/communication/broadcast",
-    "//foundation/distributedschedule/samgr_lite/samgr/adapter",
-    "//foundation/distributedschedule/samgr_lite/samgr/source",
+    "//foundation/systemabilitymgr/samgr_lite/interfaces/kits/samgr",
+    "//foundation/systemabilitymgr/samgr_lite/interfaces/kits/communication/broadcast",
+    "//foundation/systemabilitymgr/samgr_lite/samgr/adapter",
+    "//foundation/systemabilitymgr/samgr_lite/samgr/source",
     "//test/xts/acts/distributed_schedule_lite/samgr_hal/utils",
   ]
 }
