@@ -57,7 +57,6 @@ input_user_host
 camera_host
 audio_hdi_server_host
 wifi_host
-usbfnMaster_host
 usb_host
 blue_host
 wifi_hal_service
