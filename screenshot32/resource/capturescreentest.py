@@ -93,16 +93,19 @@ def GetFileFromDev(src, dst):
 def ImageCheck(str):
     conn = sqlite3.connect(str)
     cursor = conn.cursor()
+    PrintToLog("SmokeTest:: start to check media library path")
     try:
+        PrintToLog("SmokeTest:: select * from  files where mime_type = image/*")
         cursor.execute("""select * from  files where mime_type = "image/*" """)
     except:
-        print("Error: media_library.db cannot be found, please check media library path")
+        PrintToLog("SmokeTest:: error: media_library.db cannot be found, please check media library path")
+    PrintToLog("SmokeTest:: media library is ok")
     check_result = cursor.fetchone()
     print(check_result)
     if check_result != None:
-        print("Success: There are some photos in the album!!")
+        PrintToLog("SmokeTest:: success: There are some photos in the album!!")
     else:
-        print("ERROR:There are no photos in the album!!")
+        PrintToLog("SmokeTest:: error: There are no photos in the album!!")
 
 def ConnectionJudgment():
     connection_status = EnterCmd("hdc_std list targets", 2)
@@ -111,8 +114,8 @@ def ConnectionJudgment():
         connection_status = EnterCmd("hdc_std list targets", 2)
         connection_cnt += 1
     if connection_cnt == 15:
-        PrintToLog("Device disconnection!!")
-        PrintToLog("End of check, test failed!")
+        PrintToLog("SmokeTest:: Device disconnection!!")
+        PrintToLog("SmokeTest:: end of check, test failed!")
         sys.exit(101)
 
 def ConnectToWifi(tools_path):
@@ -125,7 +128,7 @@ def ConnectToWifi(tools_path):
     cnt = 2
     while cnt:
         try:
-            PrintToLog("hdc_std shell ./data/l2tool/busybox udhcpc -i wlan0 -s /data/l2tool/dhcpc.sh")
+            PrintToLog("SmokeTest:: hdc_std shell ./data/l2tool/busybox udhcpc -i wlan0 -s /data/l2tool/dhcpc.sh")
             p = subprocess.check_output(shlex.split("hdc_std -t {} shell ./data/l2tool/busybox udhcpc -i wlan0 -s /data/l2tool/dhcpc.sh".format(args.device_num)), timeout=8)
             PrintToLog(p.decode(encoding="utf-8"))
             with open(os.path.join(args.save_path, 'shot_test_{}.bat'.format(args.device_num)), mode='a', encoding='utf-8') as cmd_file:
@@ -200,20 +203,20 @@ if __name__ == "__main__":
         num = re.findall(r'[-+]?\d+', p)
         PrintToLog(num)
         if type(num) == list and len(num) > 0 and int(num[0]) < 147456 and p.find('No such file or directory', 0, len(p)) == -1:
-            PrintToLog("launcher screenshot comparison is ok!\n\n")
+            PrintToLog("SmokeTest:: launcher screenshot comparison is ok!")
             break
         elif rebootcnt >= 1:
-            PrintToLog("launcher screenshot comparison failed, reboot and try!!!\n\n")
+            PrintToLog("SmokeTest:: launcher screenshot comparison failed, reboot and try!!!")
             EnterShellCmd("rm -rf /data/*;reboot")
             for i in range(5):
                 EnterCmd("hdc_std list targets", 10)
         else:
-            PrintToLog("launcher screenshot comparison failed\n\n")
-            PrintToLog("SmokeTest find some fatal problems!")
-            PrintToLog("End of check, test failed!")
+            PrintToLog("SmokeTest:: launcher screenshot comparison failed")
+            PrintToLog("SmokeTest:: SmokeTest find some fatal problems!")
+            PrintToLog("SmokeTest:: end of check, test failed!")
             SysExit()
 
-    PrintToLog("\n\n########## First check key processes start ##############")
+    PrintToLog("\nSmokeTest:: ########## First check key processes start ##############")
     lose_process = []
     process_pid = {}
     with open(os.path.normpath(os.path.join(args.tools_path, "resource/process.txt")), "r+") as f:
@@ -238,20 +241,20 @@ if __name__ == "__main__":
                 lose_process.append(pname)
 
     if lose_process:
-        PrintToLog("\n\nERROR: %s, These processes are not exist!!!\n" % lose_process)
-        PrintToLog("SmokeTest find some fatal problems!")
-        PrintToLog("End of check, test failed!")
+        PrintToLog("SmokeTest:: error: %s, These processes are not exist!!!" % lose_process)
+        PrintToLog("SmokeTest:: SmokeTest find some fatal problems!")
+        PrintToLog("SmokeTest:: end of check, test failed!")
         SysExit()
     else:
-        PrintToLog("First processes check is ok\n")
+        PrintToLog("SmokeTest:: first processes check is ok")
 
     try:
         args.test_num.index('/')
         idx_total = args.test_num.split('/')
         if len(idx_total) != 2:
-            PrintToLog("test_num is invaild !!!")
-            PrintToLog("SmokeTest find some key problems!")
-            PrintToLog("End of check, test failed!")
+            PrintToLog("SmokeTest:: test_num is invaild !!!")
+            PrintToLog("SmokeTest:: SmokeTest find some key problems!")
+            PrintToLog("SmokeTest:: end of check, test failed!")
             sys.exit(98)
         elif idx_total[1] == '1':
             idx_list = list(range(1, len(all_app)))
@@ -260,7 +263,8 @@ if __name__ == "__main__":
     except ValueError as e:
         PrintToLog(e)
         idx_list = list(map(eval, args.test_num.split()))
-    PrintToLog(idx_list)
+    PrintToLog("SmokeTest:: start to carry out the following testcases: ")
+    PrintToLog("SmokeTest:: testcase number: {} ".format(idx_list))
 
     fail_idx_list = []
     fail_name_list = []
@@ -271,22 +275,22 @@ if __name__ == "__main__":
         call_app_cmd = single_app['entry']
         capture_screen_cmd = "/data/screen_test/printscreen -f /data/screen_test/{}_{}"
         cmp_cmd = "cmp -l /data/screen_test/{}_{} /data/screen_test/train_set/{} | wc -l"
-        PrintToLog("\n\n########## case {} : {} test start ##############".format(idx, single_app['app_name']))
+        PrintToLog("\nSmokeTest:: ########## case {} : {} test start ##############".format(idx, single_app['app_name']))
         with open(os.path.join(args.save_path, 'shot_test_{}.bat'.format(args.device_num)), mode='a', encoding='utf-8') as cmd_file:
-            cmd_file.write("\n\n::::::case {} --- {} test start \n".format(idx, single_app['app_name']))
+            cmd_file.write("\nSmokeTest::::::case {} --- {} test start \n".format(idx, single_app['app_name']))
         cmd_file.close()
         testcnt = 3
         while testcnt:
             testok = 0
             checkok = 1
             if testcnt != 3:
-                PrintToLog(">>>>>>>>>>>>>>>>>>>>>>>Try again:\n")
+                PrintToLog("SmokeTest:: this testcase try again:\n")
                 with open(os.path.join(args.save_path, 'shot_test_{}.bat'.format(args.device_num)), mode='a', encoding='utf-8') as cmd_file:
-                    cmd_file.write("\n::::::Last failed, Try again \n")
+                    cmd_file.write("\nSmokeTest::::::Last failed, try again \n")
                 cmd_file.close()
             if single_app['entry'] != "":
                 EnterShellCmd(call_app_cmd, 5)
-            PrintToLog(single_app['all_actions'])
+            PrintToLog("SmokeTest:: execute command {}".format(single_app['all_actions']))
             raw_pic_name = ''
             pic_name = ''
             for single_action in single_app['all_actions']:
@@ -313,17 +317,18 @@ if __name__ == "__main__":
                         tolerance = single_action[2]
                     else:
                         tolerance = global_pos['cmp_cmd-level'][1]
+                    PrintToLog("SmokeTest:: start to contrast screenshot")
                     p = EnterShellCmd(new_cmp_cmd, single_action[0])
                     #no_such = re.findall(r'No such file or directory', p)
                     num = re.findall(r'[-+]?\d+', p)
-                    PrintToLog(num)
+                    PrintToLog("SmokeTest:: contrast pixel difference {}".format(num))
                     if type(num) == list and len(num) > 0 and int(num[0]) < tolerance and p.find('No such file or directory', 0, len(p)) == -1:
                         if testok == 0:
                             testok = 1
-                        PrintToLog("{} screenshot check is ok!\n\n".format(raw_pic_name))
+                        PrintToLog("SmokeTest:: {} screenshot check is ok!".format(raw_pic_name))
                     else:
                         testok = -1
-                        PrintToLog("{} screenshot check is abnarmal!\n\n".format(raw_pic_name))
+                        PrintToLog("SmokeTest:: {} screenshot check is abnarmal!".format(raw_pic_name))
                     sys.stdout.flush()
                     if testok == 1 or testcnt == 1 or smoke_first_failed != '':
                         old_name = os.path.normpath(os.path.join(args.save_path, "{}_{}".format(4 - testcnt, pic_name)))
@@ -357,10 +362,10 @@ if __name__ == "__main__":
                         findsome = result.find(single_action[2], 0, len(result))
                         if findsome != -1:
                             checkok = 1
-                            PrintToLog("\"{}\" check execut result is ok, find process \"{}\"!\n".format(single_action[1], single_action[2]))
+                            PrintToLog("SmokeTest:: \"{}\" check execut result is ok, find process \"{}\"!".format(single_action[1], single_action[2]))
                         else:
                             checkok = -1
-                            PrintToLog("\"{}\" check execut result is not ok, not find process \"{}\"!\n".format(single_action[1], single_action[2]))
+                            PrintToLog("SmokeTest:: \"{}\" check execut result is not ok, not find process \"{}\"!".format(single_action[1], single_action[2]))
                         sys.stdout.flush()
                 #process_crash_check
                 elif type(single_action[1]) == str and single_action[1] == 'process_crash_check':
@@ -371,13 +376,13 @@ if __name__ == "__main__":
                         findsome = result.find(single_action[2], 0, len(result))
                         if findsome != -1:
                             testok = -1
-                            PrintToLog("\"{}\" ERROR:find fatal crash \"{}\"!\n".format(single_action[1], single_action[2]))
-                            PrintToLog("SmokeTest find some fatal problems!")
-                            PrintToLog("End of check, test failed!")
+                            PrintToLog("SmokeTest:: \"{}\" error:find fatal crash \"{}\"!".format(single_action[1], single_action[2]))
+                            PrintToLog("SmokeTest:: SmokeTest find some fatal problems!")
+                            PrintToLog("SmokeTest:: end of check, test failed!")
                             SysExit()
                         else:
                             testok = 1
-                            PrintToLog("\"{}\" check execut result is ok, not find fatal crash \"{}\"!\n".format(single_action[1], single_action[2]))
+                            PrintToLog("SmokeTest:: \"{}\" check execut result is ok, not find fatal crash \"{}\"!".format(single_action[1], single_action[2]))
                         sys.stdout.flush()
                 #other cmd handle
                 elif type(single_action[1]) == str:
@@ -394,10 +399,10 @@ if __name__ == "__main__":
                             findsome = result.find(target_[1], 0, len(result))
                             if findsome != -1:
                                 testok = 1
-                                PrintToLog("\"{}\" check execut result is ok, find \"{}\"!\n".format(target_[0], target_[1]))
+                                PrintToLog("SmokeTest:: \"{}\" check execut result is ok, find \"{}\"!".format(target_[0], target_[1]))
                             else:
                                 testok = -1
-                                PrintToLog("\"{}\" check execut result is not ok, not find \"{}\"!\n".format(target_[0], target_[1]))
+                                PrintToLog("SmokeTest:: \"{}\" check execut result is not ok, not find \"{}\"!".format(target_[0], target_[1]))
                             sys.stdout.flush()
                     #this cmd only is a name of x,y postion, to get x,y an click it
                     else:
@@ -408,45 +413,46 @@ if __name__ == "__main__":
                 EnterShellCmd(next_cmd, single_action[0])
 
             if testok == 1 and checkok == 1:
-                PrintToLog("testcase {}, {} is ok!\n\n".format(idx, single_app['app_name']))
+                PrintToLog("SmokeTest:: testcase {}, {} is ok!".format(idx, single_app['app_name']))
                 testcnt = 0
             elif testok == 1 and checkok == -1:
                 if testcnt == 1:
                     fail_idx_list.append(idx)
                     fail_name_list.append(single_app['app_name'])
                     smoke_first_failed = single_app['app_name']
-                    PrintToLog("ERROR:testcase {}, {} is failed!\n\n".format(idx, single_app['app_name']))
+                    PrintToLog("SmokeTest:: error:testcase {}, {} is failed!".format(idx, single_app['app_name']))
                 testcnt -= 1
             elif testok == -1 and smoke_first_failed == '':
-                #PrintToLog("ERROR:testcase {}, {} is failed!\n\n".format(idx, single_app['app_name']))
+                #PrintToLog("error:testcase {}, {} is failed!\n\n".format(idx, single_app['app_name']))
                 if testcnt == 1:
                     fail_idx_list.append(idx)
                     fail_name_list.append(single_app['app_name'])
                     smoke_first_failed = single_app['app_name']
-                    PrintToLog("ERROR:testcase {}, {} is failed!\n\n".format(idx, single_app['app_name']))
+                    PrintToLog("SmokeTest:: error:testcase {}, {} is failed!".format(idx, single_app['app_name']))
                 testcnt -= 1
             elif testok == -1 and smoke_first_failed != '':
                 fail_idx_list.append(idx)
                 fail_name_list.append(single_app['app_name'])
-                PrintToLog("ERROR:testcase {}, {} is failed!\n\n".format(idx, single_app['app_name']))
+                PrintToLog("SmokeTest:: error:testcase {}, {} is failed!".format(idx, single_app['app_name']))
                 testcnt = 0
             else:
                 testcnt = 0
             ConnectionJudgment()
 
+    PrintToLog("SmokeTest:: start to check sandbox path")
     medialibrarydata_pidnum = EnterShellCmd("pgrep -f com.ohos.medialibrary.medialibrarydata", 1)
     medialibrarydata_pidnum = medialibrarydata_pidnum.strip()
     sandbox_file = EnterShellCmd("echo \"ls /storage/media/local/\"|nsenter -t {} -m sh".format(medialibrarydata_pidnum), 1)
     if "files" not in sandbox_file:
-        PrintToLog("Error: can not find sandbox path : /storage/media/100/local/files")
-        PrintToLog("SmokeTest find some fatal problems!")
-        PrintToLog("End of check, test failed!")
+        PrintToLog("SmokeTest:: error: can not find sandbox path : /storage/media/local/files")
+        PrintToLog("SmokeTest:: SmokeTest find some fatal problems!")
+        PrintToLog("SmokeTest:: end of check, test failed!")
         SysExit()
     else:
-        PrintToLog("success: find sandbox path : /storage/media/100/local/files")
+        PrintToLog("SmokeTest:: success: find sandbox path : /storage/media/local/files")
 
     #key processes second check, and cmp to first check
-    PrintToLog("\n\n########## Second check key processes start ##############")
+    PrintToLog("\nSmokeTest:: ########## Second check key processes start ##############")
     second_check_lose_process = []
     #for pname in two_check_process_list + other_process_list:
     for pname in two_check_process_list:
@@ -455,30 +461,30 @@ if __name__ == "__main__":
             pidlist = pids.split()
             if process_pid[pname] != pidlist:
                 if pname in two_check_process_list:
-                    PrintToLog("ERROR: pid of %s is different the first check" % pname)
-                    PrintToLog("SmokeTest find some fatal problems!")
-                    PrintToLog("End of check, test failed!")
+                    PrintToLog("SmokeTest:: error: pid of %s is different the first check" % pname)
+                    PrintToLog("SmokeTest:: SmokeTest find some fatal problems!")
+                    PrintToLog("SmokeTest:: end of check, test failed!")
                     SysExit()
                 else:
-                    PrintToLog("WARNNING: pid of %s is different the first check" % pname)
+                    PrintToLog("SmokeTest:: warnning: pid of %s is different the first check" % pname)
             elif len(pidlist) != 1:
                 if pname in two_check_process_list:
-                    PrintToLog("ERROR: pid of %s is not only one" % pname)
-                    PrintToLog("SmokeTest find some fatal problems!")
-                    PrintToLog("End of check, test failed!")
+                    PrintToLog("SmokeTest:: error: pid of %s is not only one" % pname)
+                    PrintToLog("SmokeTest:: SmokeTest find some fatal problems!")
+                    PrintToLog("SmokeTest:: end of check, test failed!")
                     SysExit()
                 else:
-                    PrintToLog("WARNNING: pid of %s is not only one" % pname)
+                    PrintToLog("SmokeTest:: warnning: pid of %s is not only one" % pname)
         except:
             second_check_lose_process.append(pname)
 
     if second_check_lose_process:
-        PrintToLog("ERROR: pid of %s is not exist" % pname)
-        PrintToLog("SmokeTest find some fatal problems!")
-        PrintToLog("End of check, test failed!")
+        PrintToLog("SmokeTest:: error: pid of %s is not exist" % pname)
+        PrintToLog("SmokeTest:: SmokeTest find some fatal problems!")
+        PrintToLog("SmokeTest:: end of check, test failed!")
         SysExit()
     else:
-        PrintToLog("Second processes check is ok\n")
+        PrintToLog("SmokeTest:: second processes check is ok")
 
     EnterShellCmd("cd /data/log/faultlog/temp && tar -cf after_test_crash_log_{}.tar cppcrash*".format(args.device_num))
     GetFileFromDev("/data/log/faultlog/temp/after_test_crash_log_{}.tar".format(args.device_num), os.path.normpath(args.save_path))
@@ -487,18 +493,22 @@ if __name__ == "__main__":
 
     fail_str_list = [str(x) for x in fail_idx_list]
     reboot_test_num = " ".join(fail_str_list)
-    print(fail_str_list)
+    PrintToLog("SmokeTest:: failed testcase number: {} ".format(fail_str_list))
     if len(fail_idx_list) != 0:
+        PrintToLog("SmokeTest:: check \"reboot\" in reboot.txt".format(args.save_path))
         with open(os.path.normpath(os.path.join(args.tools_path, "reboot.txt")), mode='a+') as f:
             f.seek(0)
             reboot_result = f.read()
         f.close()
         if len(reboot_result) < 1 and rebootcnt >= 1:
+            PrintToLog("SmokeTest:: \"reboot\" is not found in the reboot.txt, the device will reboot and try the failed testcase")
+            PrintToLog("SmokeTest:: mkdir {}\\reboot".format(args.save_path))
             os.system("mkdir {}\\reboot".format(args.save_path))
+            PrintToLog("SmokeTest:: write \"reboot\" into reboot.txt".format(args.save_path))
             with open(os.path.normpath(os.path.join(args.tools_path, "reboot.txt")), mode='w') as f:
                 f.write("reboot")
             f.close()
-            PrintToLog("ERROR: name {}, index {}, these testcase is failed, rm /data/* and reboot!!".format(fail_name_list, fail_idx_list))
+            PrintToLog("SmokeTest:: error: name {}, index {}, these testcase is failed, rm /data/* and reboot!!".format(fail_name_list, fail_idx_list))
             EnterShellCmd("rm -rf /data/* && reboot")
             reboot_result_list = EnterCmd("hdc_std list targets", 2)
             number = 0
@@ -516,11 +526,11 @@ if __name__ == "__main__":
             else:
                 sys.exit(101)
         else:
-            PrintToLog("ERROR: name {}, index {}, these testcase is failed".format(fail_name_list, fail_idx_list))
-            PrintToLog("SmokeTest find some key problems!")
-            PrintToLog("End of check, test failed!")
+            PrintToLog("SmokeTest:: error: the device has been restarted, name {}, index {}, these testcase is failed".format(fail_name_list, fail_idx_list))
+            PrintToLog("SmokeTest:: SmokeTest find some key problems!")
+            PrintToLog("SmokeTest:: end of check, test failed!")
             sys.exit(98)
     else:
-        PrintToLog("All testcase is ok")
-        PrintToLog("End of check, test succeeded!")
+        PrintToLog("SmokeTest:: all testcase is ok")
+        PrintToLog("SmokeTest:: end of check, test succeeded!")
         sys.exit(0)
