@@ -1,15 +1,18 @@
 [
     {
-        "DEVICE_1":[1, 2, 3, 4, 6],
-        "DEVICE_2":[5, 7, 8, 9],
+        "DEVICE_1":[2, 3, 4, 5, 8],
+        "DEVICE_2":[1, 6, 7, 9],
         "return-x-y":[210, 1240],
         "recent-x-y":[515, 1240],
         "home-x-y":[360, 1240],
         "recent_del-x-y":[360, 1170],
         "permisson_ok-x-y":[575, 700],
-        "permisson_no-x-y":[140, 700],
         "take_photos-x-y":[360, 1095],
-        "phone-x-y":[565, 1045],
+        "convert_to_video-x-y":[430, 980],
+        "convert_to_photos-x-y":[200, 1095],
+        "last_photos-x-y":[100, 200],
+        "album_click-x-y":[530, 1150],
+        "stop_video-x-y":[320, 1095],
         "shot_cmd":[""],
         "remount":["mount -o rw,remount"],
         "stop_hilog":["hilog -w stop"],
@@ -45,6 +48,18 @@
         ]
     },
     {
+        "app_name": "photos",
+        "entry": "",
+        "start_screenshot": ["aa start -a com.ohos.screenshot.ServiceExtAbility -b com.ohos.screenshot"],
+        "start_photos": ["aa start -a com.ohos.photos.MainAbility -b com.ohos.photos"],
+        "cp_db": ["cp /data/app/el2/100/database/com.ohos.medialibrary.medialibrarydata/rdb/media_library.db /data/photo.db"],
+        "all_actions": [
+            [8, "start_screenshot"], [8, "start_screenshot"], [5, "start_photos"],[2, "permisson_ok-x-y"], [2, "permisson_ok-x-y"], [2, "permisson_ok-x-y"], [2, "album_click-x-y"],
+            [2, "last_photos-x-y"], [2, "last_photos-x-y"], [2, "shot_cmd"], [1, "cmp_cmd-level"], [2, "home-x-y"], [2, "recent-x-y"], [2, "recent_del-x-y"], [1, "cp_db"],
+            [1, "get_file_from_dev", "/data/photo.db"], [2, "photo_check"], [1, "process_check", "com.ohos.medialibrary.medialibrarydata"]
+        ]
+    },
+    {
         "app_name": "video_test",
         "entry": "",
         "mk_test_dir":["mkdir -p /data/app/el1/bundle/public/ohos.acts.multimedia.video.videoplayer/ohos.acts.multimedia.video.videoplayer/assets/entry/resources/rawfile"],
@@ -71,14 +86,6 @@
         ]
     },
     {
-        "app_name": "photos",
-        "entry": "aa start -a com.ohos.photos.MainAbility -b com.ohos.photos",
-        "all_actions": [
-            [2, "permisson_ok-x-y"], [2, "permisson_ok-x-y"], [2, "permisson_ok-x-y"], [2, "shot_cmd"], [1, "cmp_cmd-level"], [2, "home-x-y"], [2, "recent-x-y"], [2, "recent_del-x-y"],
-            [1, "process_check", "com.ohos.medialibrary.medialibrarydata"]
-        ]
-    },
-    {
         "app_name": "camera",
         "entry": "",
         "check_result":["cd /data/log/hilog && grep -nr PreviewOutputCallback", "OnFrameStarted"],
@@ -86,10 +93,14 @@
         "open_camera_log":["rm /data/log/hilog/* && hilog -b X;hilog -b D -T CAMERA;hilog -r"],
         "start_camera":["aa start -a com.ohos.camera.MainAbility -b com.ohos.camera"],
         "recover_log":["cd data/log/hilog/;hilog -x > camera_log.txt;hilog -b D"],
+        "cp_db": ["cp /data/app/el2/100/database/com.ohos.medialibrary.medialibrarydata/rdb/media_library.db /data/video_photo.db"],
         "all_actions": [
             [1, "open_camera_log"], [5, "start_camera"], [2, "permisson_ok-x-y"], [2, "permisson_ok-x-y"], [2, "permisson_ok-x-y"], [2, "permisson_ok-x-y"], [2, "permisson_ok-x-y"], [2, "permisson_ok-x-y"],
-            [2, "take_photos-x-y"], [2, "take_photos-x-y"], [1, "recover_log"], [1, "check_result"],[1, "shot_cmd"], [1, "get_file_from_dev", "/data/app/el2/100/database/com.ohos.medialibrary.medialibrarydata/rdb/media_library.db"],
-            [2, "image_check"], [2, "home-x-y"], [2, "recent-x-y"], [2, "recent_del-x-y"], [1, "compress_log"], [1, "get_file_from_dev", "/data/log/hilog/camera_log.tar"]
+            [2, "take_photos-x-y"], [2, "take_photos-x-y"], [2, "convert_to_video-x-y"], [5, "take_photos-x-y"], [2, "stop_video-x-y"], [5, "take_photos-x-y"], [2, "stop_video-x-y"], [5, "convert_to_photos-x-y"],
+            [2, "permisson_ok-x-y"], [2, "permisson_ok-x-y"], [1, "recover_log"], [1, "check_result"], [1, "shot_cmd", "camera_to_photos"], [1, "cmp_cmd-level", 921600], [2, "home-x-y"], [2, "recent-x-y"],
+            [2, "recent_del-x-y"], [5, "start_camera"], [2, "take_photos-x-y"], [2, "take_photos-x-y"], [2, "convert_to_video-x-y"], [5, "take_photos-x-y"], [2, "stop_video-x-y"], [5, "take_photos-x-y"],
+            [2, "stop_video-x-y"], [2, "home-x-y"], [2, "recent-x-y"], [2, "recent_del-x-y"], [1, "cp_db"], [1, "get_file_from_dev", "/data/video_photo.db"], [2, "photo_and_video_check"], [1, "compress_log"],
+            [1, "get_file_from_dev", "/data/log/hilog/camera_log.tar"]
         ]
     },
     {
