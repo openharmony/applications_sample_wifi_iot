@@ -74,7 +74,7 @@ def EnterCmd(mycmd, waittime=0, printresult=1):
             cmd_f.close()
     return result
 
-def EnterShellCmd(shellcmd, waittime = 0, printresult = 1):
+def EnterShellCmd(shellcmd, waittime=0, printresult=1):
     if shellcmd == "":
         return
     cmd = "hdc_std -t {} shell \"{}\"".format(args.device_num, shellcmd)
@@ -315,6 +315,8 @@ if __name__ == "__main__":
                 mode='a', encoding='utf-8') as cmd_f:
                     cmd_f.write("\nSmokeTest::::::Last failed, try again \n")
                 cmd_f.close()
+            if idx == 2 or idx == 3 or idx == 8:
+                testcnt = 1
             if single_app['entry'] != "":
                 EnterShellCmd(call_app_cmd, 5)
             PrintToLog("SmokeTest:: execute command {}".format(single_app['all_actions']))
