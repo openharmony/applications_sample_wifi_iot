@@ -13,6 +13,7 @@
 # limitations under the License.
 
 from ast import parse
+import encodings
 import json
 import sys
 import os
@@ -189,6 +190,7 @@ if __name__ == "__main__":
     parser.add_argument('--anwser_path', type=str, default = 'D:\\DeviceTestTools\\screenshot\\resource')
     parser.add_argument('--save_path', type=str, default = 'D:\\DeviceTestTools\\screenshot')
     parser.add_argument('--device_num', type=str, default = 'null')
+    parser.add_argument('--pr_url', type=str, default = 'https://gitee.com/openharmony/applications_sample_wifi_iot/')
     args = parser.parse_args()
 
     if args.device_num == 'null':
@@ -527,6 +529,76 @@ if __name__ == "__main__":
         SysExit()
     else:
         PrintToLog("SmokeTest:: second processes check is ok")
+
+    pr_analysis = args.pr_url
+    if "applications_sample_wifi_iot" or "softbus" in pr_analysis:
+        #distributed smoketest
+        PrintToLog("SmokeTest:: close selinux")
+        EnterShellCmd("mount -o rw,remount /", 1)
+        EnterShellCmd("sed -i 's/enforcing/permissive/g' /system/etc/selinux/config", 1)
+        EnterShellCmd("cat /system/etc/selinux/config | grep SELINUX=", 1)
+        EnterShellCmd("reboot")
+        for i in range(6):
+            EnterCmd("hdc_std list targets", 5)
+        unlockcnt = 3
+        PrintToLog("SmokeTest:: start remove lock")
+        while unlockcnt:
+            EnterShellCmd("uinput -T -m 425 1000 425 400;power-shell wakeup;\
+            uinput -T -m 425 400 425 1000;power-shell setmode 602;uinput -T -m 425 1000 425 400;", 1)
+            unlockcnt -= 1
+        EnterCmd("hdc_std -t {} target mount".format(args.device_num), 1)
+        EnterShellCmd("mount -o rw,remount /", 1)
+        EnterShellCmd("hilog -r", 1)
+        EnterShellCmd("param set persist.ace.testmode.enabled 1", 1)
+        if args.test_num == "2/2":
+            EnterShellCmd("aa force-stop com.example.rkinputpin", 1)
+            EnterShellCmd("bm uninstall -n com.example.rkinputpin", 1)
+            EnterCmd("hdc_std -t {} app install -r {}\\distributecalc_test\\input_pin.hap".format(args.device_num,\
+            args.tools_path), 1)
+            EnterShellCmd("ifconfig eth0 192.168.0.1", 1)
+            ping_result = EnterShellCmd("ping 192.168.0.2 -i 1 -c 2", 3)
+            ping_cnt = 0
+            while "2 packets transmitted, 2 received" not in ping_result and ping_cnt < 15:
+                ping_result = EnterShellCmd("ping 192.168.0.2 -i 1 -c 2", 3)
+                ping_cnt += 1
+            EnterShellCmd("hilog -Q pidoff;hilog -G 512M;hilog -w start -l 400000000 -m none")
+            PrintToLog("SmokeTest:: start distributed smoke test")
+            os.system("hdc_std -t {} shell aa test -b com.example.rkinputpin -p com.example.rkinputpin -s unittest\
+            OpenHarmonyTestRunner -s class inputPINTestDemo -s timeout 3000000".format(args.device_num))
+            EnterShellCmd("cd data/log/hilog/;hilog -x > hilog_inputpin.txt", 1)
+            EnterCmd("hdc_std -t {} file recv \"/data/log/hilog/hilog_inputpin.txt\" \"{}\"".format(args.device_num,\
+            os.path.normpath(args.save_path)), 1)
+        elif args.test_num == "1/2":
+            EnterShellCmd("aa force-stop com.example.rkgetpin", 1)
+            EnterShellCmd("bm uninstall -n com.example.rkgetpin", 1)
+            EnterCmd("hdc_std -t {} app install -r {}\\distributecalc_test\\get_pin.hap".format(args.device_num,\
+            args.tools_path), 1)
+            EnterShellCmd("ifconfig eth0 192.168.0.2", 1)
+            ping_result = EnterShellCmd("ping 192.168.0.1 -i 1 -c 2", 3)
+            ping_cnt = 0
+            while "2 packets transmitted, 2 received" not in ping_result and ping_cnt < 60:
+                ping_result = EnterShellCmd("ping 192.168.0.1 -i 1 -c 2", 3)
+                ping_cnt += 1
+            EnterShellCmd("hilog -Q pidoff;hilog -G 512M;hilog -w start -l 400000000 -m none")
+            PrintToLog("SmokeTest:: start distributed smoke test")
+            os.system("hdc_std -t {} shell aa test -b com.example.rkgetpin -p com.example.rkgetpin -s unittest\
+            OpenHarmonyTestRunner -s class getPINTestDemo -s timeout 3000000".format(args.device_num))
+            EnterShellCmd("cd data/log/hilog/;hilog -x > hilog_getpin.txt", 1)
+            EnterCmd("hdc_std -t {} file recv \"/data/log/hilog/hilog_getpin.txt\" \"{}\"".format(args.device_num,\
+            os.path.normpath(args.save_path)), 1)
+            getpin_result = 0
+            with open(os.path.normpath(os.path.join(args.save_path, "hilog_getpin.txt")), mode='r', encoding='gbk',\
+            errors='ignore') as fs:
+                getpin_lines = fs.readlines()
+                for content in getpin_lines:
+                    if "rkgetpin:: distributedcalc test is ok!!!" in content:
+                        getpin_result = 1
+                        break
+            fs.close()
+            if getpin_result == 1:
+                PrintToLog("SmokeTest:: distributed smoke test is ok!!!")
+            else:
+                PrintToLog("SmokeTest:: error: distributedcalc test failed")
 
     EnterShellCmd("cd /data/log/faultlog/temp && tar -cf after_test_crash_log_{}.tar cppcrash*".format(args.device_num))
     GetFileFromDev("/data/log/faultlog/temp/after_test_crash_log_{}.tar".format(args.device_num), \
