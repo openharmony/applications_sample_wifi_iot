@@ -130,6 +130,7 @@ if __name__ == "__main__":
     parser.add_argument('--anwser_path', type=str, default = 'D:\\DeviceTestTools\\screenshot\\resource')
     parser.add_argument('--save_path', type=str, default = 'D:\\DeviceTestTools\\screenshot')
     parser.add_argument('--device_num', type=str, default = 'null')
+    parser.add_argument('--pr_url', type=str, default = 'https://gitee.com/openharmony/applications_sample_wifi_iot/')
     args = parser.parse_args()
 
     if args.device_num == 'null':
