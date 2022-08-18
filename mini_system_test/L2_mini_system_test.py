@@ -108,7 +108,7 @@ if __name__ == "__main__":
     process_pid = {}
 
     two_check_process_list = ['huks_service', 'hilogd', 'hdf_devmgr', 'samgr', 'foundation', 'accesstoken_ser',]
-    other_process_list = ['softbus_server', 'deviceauth_service', 'updater_sa']
+    other_process_list = ['softbus_server', 'deviceauth_service']
 
     for pname in two_check_process_list:
         pids = EnterCmd("hdc_std -t {} shell pidof {}".format(args.device_num, pname), 0, 1)

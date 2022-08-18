@@ -29,7 +29,6 @@ accountmgr
 time_service
 distributeddata
 useriam
-updater_sa
 inputmethod_ser
 ui_service
 fms_service
