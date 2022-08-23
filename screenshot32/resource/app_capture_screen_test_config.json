@@ -1,7 +1,7 @@
 [
     {
-        "DEVICE_1":[2, 3, 4, 5, 8, 10, 11],
-        "DEVICE_2":[1, 6, 7, 9, 12, 13],
+        "DEVICE_1":[2, 3, 4, 6, 8, 10, 11],
+        "DEVICE_2":[1, 5, 7, 9, 12, 13],
         "return-x-y":[210, 1240],
         "recent-x-y":[515, 1240],
         "home-x-y":[360, 1240],
@@ -94,14 +94,12 @@
         "open_camera_log":["rm /data/log/hilog/* && hilog -b X;hilog -b D -T CAMERA;hilog -r"],
         "start_camera":["aa start -a com.ohos.camera.MainAbility -b com.ohos.camera"],
         "recover_log":["cd data/log/hilog/;hilog -x > camera_log.txt;hilog -b D"],
-        "cp_db": ["cp /data/app/el2/100/database/com.ohos.medialibrary.medialibrarydata/rdb/media_library.db /data/video_photo.db"],
+        "cp_db": ["cp /data/app/el2/100/database/com.ohos.medialibrary.medialibrarydata/rdb/media_library.db /data/camera_photo.db"],
         "all_actions": [
             [1, "open_camera_log"], [5, "start_camera"], [2, "permisson_ok-x-y"], [2, "permisson_ok-x-y"], [2, "permisson_ok-x-y"], [2, "permisson_ok-x-y"], [2, "permisson_ok-x-y"], [2, "permisson_ok-x-y"],
-            [2, "take_photos-x-y"], [2, "take_photos-x-y"], [2, "convert_to_video-x-y"], [5, "take_photos-x-y"], [2, "stop_video-x-y"], [5, "take_photos-x-y"], [2, "stop_video-x-y"], [5, "convert_to_photos-x-y"],
+            [2, "take_photos-x-y"], [2, "take_photos-x-y"], [2, "convert_to_video-x-y"], [5, "take_photos-x-y"], [2, "stop_video-x-y"], [5, "take_photos-x-y"], [2, "stop_video-x-y"], [6, "convert_to_photos-x-y"],
             [2, "permisson_ok-x-y"], [2, "permisson_ok-x-y"], [1, "recover_log"], [1, "check_result"], [1, "shot_cmd", "camera_to_photos"], [1, "cmp_cmd-level", 921600], [2, "home-x-y"], [2, "recent-x-y"],
-            [2, "recent_del-x-y"], [5, "start_camera"], [2, "take_photos-x-y"], [2, "take_photos-x-y"], [2, "convert_to_video-x-y"], [5, "take_photos-x-y"], [2, "stop_video-x-y"], [5, "take_photos-x-y"],
-            [2, "stop_video-x-y"], [2, "home-x-y"], [2, "recent-x-y"], [2, "recent_del-x-y"], [1, "cp_db"], [1, "get_file_from_dev", "/data/video_photo.db"], [2, "photo_and_video_check"], [1, "compress_log"],
-            [1, "get_file_from_dev", "/data/log/hilog/camera_log.tar"]
+            [2, "recent_del-x-y"], [1, "cp_db"], [1, "get_file_from_dev", "/data/camera_photo.db"], [2, "camera_photo_check"], [1, "compress_log"], [1, "get_file_from_dev", "/data/log/hilog/camera_log.tar"]
         ]
     },
     {

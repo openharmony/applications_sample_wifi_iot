@@ -107,14 +107,14 @@ def ImageCheck(str, testnum=1):
         cursor_image.execute("""select * from  files where mime_type = "image/*" """)
     except:
         PrintToLog("SmokeTest:: error: media_library.db cannot be found, please check media library path")
-        SysExit()
+        return -1
     if testnum == 2:
         try:
             PrintToLog("SmokeTest:: select * from  files where mime_type = video/mp4")
             cursor_video.execute("""select * from  files where mime_type = "video/mp4" """)
         except:
             PrintToLog("SmokeTest:: error: media_library.db cannot be found, please check media library path")
-            SysExit()
+            return -1
     PrintToLog("SmokeTest:: media library is ok")
     image_result = cursor_image.fetchone()
     video_result = cursor_video.fetchone()
@@ -387,10 +387,10 @@ if __name__ == "__main__":
                 elif type(single_action[1]) == str and single_action[1] == 'connect_wifi':
                     next_cmd = ""
                     ConnectToWifi(args.tools_path)
-                elif type(single_action[1]) == str and single_action[1] == 'photo_and_video_check':
+                elif type(single_action[1]) == str and single_action[1] == 'camera_photo_check':
                     next_cmd = ""
-                    if ImageCheck("{}\\video_photo.db".format(os.path.normpath(args.save_path)),\
-                    2) == 1 and testok == 1:
+                    if ImageCheck("{}\\camera_photo.db".format(os.path.normpath(args.save_path)),\
+                    1) == 1 and testok == 1:
                         testok = 1
                     else:
                         testok = -1
@@ -531,8 +531,10 @@ if __name__ == "__main__":
         PrintToLog("SmokeTest:: second processes check is ok")
 
     pr_analysis = args.pr_url
-    if "applications_sample_wifi_iot" or "softbus" in pr_analysis:
+    PrintToLog("SmokeTest:: get pr: {}".format(args.pr_url))
+    if "applications_sample_wifi_iot" in pr_analysis or "softbus" in pr_analysis:
         #distributed smoketest
+        EnterShellCmd("param set persist.ace.testmode.enabled 1", 1)
         PrintToLog("SmokeTest:: close selinux")
         EnterShellCmd("mount -o rw,remount /", 1)
         EnterShellCmd("sed -i 's/enforcing/permissive/g' /system/etc/selinux/config", 1)
@@ -546,59 +548,49 @@ if __name__ == "__main__":
             EnterShellCmd("uinput -T -m 425 1000 425 400;power-shell wakeup;\
             uinput -T -m 425 400 425 1000;power-shell setmode 602;uinput -T -m 425 1000 425 400;", 1)
             unlockcnt -= 1
-        EnterCmd("hdc_std -t {} target mount".format(args.device_num), 1)
-        EnterShellCmd("mount -o rw,remount /", 1)
-        EnterShellCmd("hilog -r", 1)
-        EnterShellCmd("param set persist.ace.testmode.enabled 1", 1)
-        if args.test_num == "2/2":
-            EnterShellCmd("aa force-stop com.example.rkinputpin", 1)
-            EnterShellCmd("bm uninstall -n com.example.rkinputpin", 1)
-            EnterCmd("hdc_std -t {} app install -r {}\\distributecalc_test\\input_pin.hap".format(args.device_num,\
-            args.tools_path), 1)
+        if args.test_num == "1/2":
             EnterShellCmd("ifconfig eth0 192.168.0.1", 1)
             ping_result = EnterShellCmd("ping 192.168.0.2 -i 1 -c 2", 3)
             ping_cnt = 0
-            while "2 packets transmitted, 2 received" not in ping_result and ping_cnt < 15:
-                ping_result = EnterShellCmd("ping 192.168.0.2 -i 1 -c 2", 3)
+            while "2 packets transmitted, 2 received" not in ping_result and ping_cnt < 25:
+                ping_result = EnterShellCmd("ping 192.168.0.2 -i 1 -c 2", 5)
                 ping_cnt += 1
-            EnterShellCmd("hilog -Q pidoff;hilog -G 512M;hilog -w start -l 400000000 -m none")
-            PrintToLog("SmokeTest:: start distributed smoke test")
-            os.system("hdc_std -t {} shell aa test -b com.example.rkinputpin -p com.example.rkinputpin -s unittest\
-            OpenHarmonyTestRunner -s class inputPINTestDemo -s timeout 3000000".format(args.device_num))
-            EnterShellCmd("cd data/log/hilog/;hilog -x > hilog_inputpin.txt", 1)
-            EnterCmd("hdc_std -t {} file recv \"/data/log/hilog/hilog_inputpin.txt\" \"{}\"".format(args.device_num,\
-            os.path.normpath(args.save_path)), 1)
-        elif args.test_num == "1/2":
-            EnterShellCmd("aa force-stop com.example.rkgetpin", 1)
-            EnterShellCmd("bm uninstall -n com.example.rkgetpin", 1)
-            EnterCmd("hdc_std -t {} app install -r {}\\distributecalc_test\\get_pin.hap".format(args.device_num,\
-            args.tools_path), 1)
+            PrintToLog("SmokeTest:: ##### case 14 : distributed test start #####")
+        elif args.test_num == "2/2":
             EnterShellCmd("ifconfig eth0 192.168.0.2", 1)
             ping_result = EnterShellCmd("ping 192.168.0.1 -i 1 -c 2", 3)
             ping_cnt = 0
-            while "2 packets transmitted, 2 received" not in ping_result and ping_cnt < 60:
-                ping_result = EnterShellCmd("ping 192.168.0.1 -i 1 -c 2", 3)
+            while "2 packets transmitted, 2 received" not in ping_result and ping_cnt < 25:
+                ping_result = EnterShellCmd("ping 192.168.0.1 -i 1 -c 2", 5)
                 ping_cnt += 1
-            EnterShellCmd("hilog -Q pidoff;hilog -G 512M;hilog -w start -l 400000000 -m none")
-            PrintToLog("SmokeTest:: start distributed smoke test")
-            os.system("hdc_std -t {} shell aa test -b com.example.rkgetpin -p com.example.rkgetpin -s unittest\
-            OpenHarmonyTestRunner -s class getPINTestDemo -s timeout 3000000".format(args.device_num))
-            EnterShellCmd("cd data/log/hilog/;hilog -x > hilog_getpin.txt", 1)
-            EnterCmd("hdc_std -t {} file recv \"/data/log/hilog/hilog_getpin.txt\" \"{}\"".format(args.device_num,\
-            os.path.normpath(args.save_path)), 1)
-            getpin_result = 0
-            with open(os.path.normpath(os.path.join(args.save_path, "hilog_getpin.txt")), mode='r', encoding='gbk',\
-            errors='ignore') as fs:
-                getpin_lines = fs.readlines()
-                for content in getpin_lines:
-                    if "rkgetpin:: distributedcalc test is ok!!!" in content:
-                        getpin_result = 1
-                        break
-            fs.close()
-            if getpin_result == 1:
-                PrintToLog("SmokeTest:: distributed smoke test is ok!!!")
+            PrintToLog("SmokeTest:: ##### case 14 : distributed test start #####")
+            execute_path = os.path.normpath(os.path.join(args.tools_path, "DistributedTest"))
+            PrintToLog("SmokeTest:: execute_path {}".format(execute_path))
+            os.system("cd {} && python main.py run -l DistributedTest".format(execute_path))
+            report_path = os.path.normpath(os.path.join(args.tools_path, "DistributedTest\\reports"))
+            PrintToLog("SmokeTest:: report_path {}".format(report_path))
+            task_file = "task_log.log"
+            file_name = ''
+            distributed_result = 0
+            for root, dirs, files in os.walk(report_path):
+                if task_file in files:
+                    file_name = os.path.join(root, task_file)
+            PrintToLog("SmokeTest:: file_name {}".format(file_name))
+            try:
+                with open(file_name, mode='r', encoding='utf-8', errors='ignore') as fs:
+                    report_lines = fs.readlines()
+                    for content in report_lines:
+                        if "total: 1, passed: 1" in content:
+                            distributed_result = 1
+                            break
+                fs.close()
+            except Exception as reason:
+                PrintToLog("SmokeTest:: task_log.log is not exist!")
+                PrintToLog("SmokeTest:: error:testcase 14, distributed is failed!")
+            if distributed_result == 1:
+                PrintToLog("SmokeTest:: testcase 14, distributed is ok!")
             else:
-                PrintToLog("SmokeTest:: error: distributedcalc test failed")
+                PrintToLog("SmokeTest:: error:testcase 14, distributed is failed!")
 
     EnterShellCmd("cd /data/log/faultlog/temp && tar -cf after_test_crash_log_{}.tar cppcrash*".format(args.device_num))
     GetFileFromDev("/data/log/faultlog/temp/after_test_crash_log_{}.tar".format(args.device_num), \
@@ -629,7 +621,7 @@ if __name__ == "__main__":
             EnterShellCmd("rm -rf /data/* && reboot")
             reboot_result_list = EnterCmd("hdc_std list targets", 2)
             number = 0
-            while "7001005458323933328a" not in reboot_result_list and number < 15:
+            while args.device_num not in reboot_result_list and number < 15:
                 reboot_result_list = EnterCmd("hdc_std list targets", 2)
                 number += 1
             EnterShellCmd("rm /data/log/hilog/*;hilog -r;hilog -w start -l 400000000 -m none", 1)
