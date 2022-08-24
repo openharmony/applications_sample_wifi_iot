@@ -63,15 +63,14 @@
     {
         "app_name": "video_test",
         "entry": "",
-        "mk_test_dir":["mkdir -p /data/app/el1/bundle/public/ohos.acts.multimedia.video.videoplayer/ohos.acts.multimedia.video.videoplayer/assets/entry/resources/rawfile"],
+        "mk_test_dir":["mkdir -p /data/app/el2/100/base/ohos.acts.multimedia.video.videoplayer/haps/entry/files"],
         "start_video_log":["rm /data/log/hilog/* && hilog -r && hilog -Q pidoff;hilog -G 512M;hilog -w start -l 400000000 -m none"],
-        "start_test":["aa start -a ohos.acts.multimedia.video.videoplayer.MainAbility -b ohos.acts.multimedia.video.videoplayer"],
-        "check_result":["cd /data/log/hilog && grep -nr 'total cases'", "failure 0,error 0,pass 1"],
+        "start_test":["aa test -p ohos.acts.multimedia.video.videoplayer -b ohos.acts.multimedia.video.videoplayer -s unittest OpenHarmonyTestRunner -w 2000000 -s timeout 60000", "Failure: 0, Error: 0, Pass: 1"],
         "compress_log":["cd /data/log/hilog && tar -cf video_log.tar *"],
         "all_actions": [
           [1,"start_video_log"], [2, "install_hap", "vediotest/ActsVideoPlayerJsTest.hap"], [1, "mk_test_dir"], [1, "remount"], 
-          [1, "send_file_to_dev", "vediotest/H264_AAC.mp4", "/data/app/el1/bundle/public/ohos.acts.multimedia.video.videoplayer/ohos.acts.multimedia.video.videoplayer/assets/entry/resources/rawfile/"],
-          [15, "start_test"], [1, "stop_hilog"], [1, "check_result"], [1, "compress_log"], [1, "get_file_from_dev", "/data/log/hilog/video_log.tar"],
+          [1, "send_file_to_dev", "vediotest/H264_AAC.mp4", "/data/app/el2/100/base/ohos.acts.multimedia.video.videoplayer/haps/entry/files/"],
+          [15, "start_test"], [1, "stop_hilog"], [1, "compress_log"], [1, "get_file_from_dev", "/data/log/hilog/video_log.tar"],
           [2, "home-x-y"], [2, "recent-x-y"], [2, "recent_del-x-y"]
         ]
     },
