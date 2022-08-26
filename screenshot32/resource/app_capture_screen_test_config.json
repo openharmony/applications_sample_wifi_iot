@@ -71,7 +71,7 @@
           [1,"start_video_log"], [2, "install_hap", "vediotest/ActsVideoPlayerJsTest.hap"], [1, "mk_test_dir"], [1, "remount"], 
           [1, "send_file_to_dev", "vediotest/H264_AAC.mp4", "/data/app/el2/100/base/ohos.acts.multimedia.video.videoplayer/haps/entry/files/"],
           [15, "start_test"], [1, "stop_hilog"], [1, "compress_log"], [1, "get_file_from_dev", "/data/log/hilog/video_log.tar"],
-          [2, "home-x-y"], [2, "recent-x-y"], [2, "recent_del-x-y"]
+          [2, "recent-x-y"], [2, "recent_del-x-y"]
         ]
     },
     {
