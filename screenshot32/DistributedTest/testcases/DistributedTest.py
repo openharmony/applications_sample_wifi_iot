@@ -1,8 +1,9 @@
 # -*- coding: utf-8 -*-
 import time
+import threading
+import re
 from devicetest.core.test_case import TestCase
 from devicetest.aw.OpenHarmony import CommonOH
-import threading
 
 
 class DistributedTest(TestCase):
@@ -38,17 +39,32 @@ class DistributedTest(TestCase):
         CommonOH.click(self.Phone1, 500, 706)
         CommonOH.click(self.Phone1, 500, 706)
         CommonOH.touchByType(self.Phone1, "image", index=1)
+        time.sleep(1)
         CommonOH.touchByText(self.Phone1, "取消")
         CommonOH.touchByType(self.Phone1, "image", index=1)
+        time.sleep(1)
         CommonOH.touchByType(self.Phone1, "input", index=1)
         time.sleep(1)
         #确定
         CommonOH.click(self.Phone2, 500, 620)
         CommonOH.click(self.Phone2, 500, 620)
         code = CommonOH.getTextByCondition(self.Phone2, "请在设备端输入链接码进行验证", relativePath="AFTER")
-        CommonOH.inputTextByType(self.Phone1, "input", code)
+        self.code = re.findall("[0-9]{6}", code)[0]
+        #输pin码
+        CommonOH.click(self.Phone1, 300, 612, downtime=500)
+        time.sleep(1)
+        #切换至数字输入
+        CommonOH.click(self.Phone1, 60, 1145)
+        time.sleep(1)
+        for i in self.code:
+            if i == "0":
+                CommonOH.click(self.Phone1, 676, 778)
+            else:
+                j = int(i) - 1
+                CommonOH.click(self.Phone1, 46 + j * 70, 778)
+        CommonOH.click(self.Phone1, 300, 612)
+        time.sleep(1)
         # 确定
-        CommonOH.click(self.Phone1, 500, 690)
         CommonOH.click(self.Phone1, 500, 690)
 
     def sub_distributed_smoke_testcase_0300(self):

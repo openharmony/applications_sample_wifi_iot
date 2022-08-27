@@ -85,9 +85,9 @@ def SysExit():
     EnterShellCmd("cd /data/log/faultlog/temp && tar -cf after_test_crash_log_{}.tar cppcrash*".format(args.device_num))
     GetFileFromDev("/data/log/faultlog/temp/after_test_crash_log_{}.tar".format(args.device_num), \
     os.path.normpath(args.save_path))
-    PrintToLog("SmokeTest:: SmokeTest find some fatal problems!")
+    PrintToLog("SmokeTest:: SmokeTest find some key problems!")
     PrintToLog("SmokeTest:: End of check, test failed!")
-    sys.exit(99)
+    sys.exit(98)
 
 def SendFileToDev(src, dst):
     cmd = "hdc_std -t {} file send \"{}\" \"{}\"".format(args.device_num, src, dst)
@@ -280,9 +280,7 @@ if __name__ == "__main__":
         idx_total = args.test_num.split('/')
         if len(idx_total) != 2:
             PrintToLog("SmokeTest:: test_num is invaild !!!")
-            PrintToLog("SmokeTest:: SmokeTest find some key problems!")
-            PrintToLog("SmokeTest:: End of check, test failed!")
-            sys.exit(98)
+            SysExit()
         elif idx_total[1] == '1':
             idx_list = list(range(1, len(all_app)))
         else:
@@ -524,15 +522,13 @@ if __name__ == "__main__":
 
     if second_check_lose_process:
         PrintToLog("SmokeTest:: error: pid of %s is not exist" % pname)
-        PrintToLog("SmokeTest:: SmokeTest find some fatal problems!")
-        PrintToLog("SmokeTest:: End of check, test failed!")
         SysExit()
     else:
         PrintToLog("SmokeTest:: second processes check is ok")
 
     pr_analysis = args.pr_url
     PrintToLog("SmokeTest:: get pr: {}".format(args.pr_url))
-    if "applications_sample_wifi_iot" in pr_analysis or "softbus" in pr_analysis:
+    if "openharmony" in pr_analysis:
         #distributed smoketest
         EnterShellCmd("param set persist.ace.testmode.enabled 1", 1)
         PrintToLog("SmokeTest:: close selinux")
@@ -552,15 +548,19 @@ if __name__ == "__main__":
             EnterShellCmd("ifconfig eth0 192.168.0.1", 1)
             ping_result = EnterShellCmd("ping 192.168.0.2 -i 1 -c 2", 3)
             ping_cnt = 0
-            while "2 packets transmitted, 2 received" not in ping_result and ping_cnt < 25:
+            while "2 packets transmitted, 2 received" not in ping_result and ping_cnt < 60:
                 ping_result = EnterShellCmd("ping 192.168.0.2 -i 1 -c 2", 5)
                 ping_cnt += 1
             PrintToLog("SmokeTest:: ##### case 14 : distributed test start #####")
+            if len(fail_idx_list) != 0:
+                PrintToLog("SmokeTest:: error: name {}, index {}, these testcase is failed".format(fail_name_list,\
+                fail_idx_list))
+                SysExit()
         elif args.test_num == "2/2":
             EnterShellCmd("ifconfig eth0 192.168.0.2", 1)
             ping_result = EnterShellCmd("ping 192.168.0.1 -i 1 -c 2", 3)
             ping_cnt = 0
-            while "2 packets transmitted, 2 received" not in ping_result and ping_cnt < 25:
+            while "2 packets transmitted, 2 received" not in ping_result and ping_cnt < 60:
                 ping_result = EnterShellCmd("ping 192.168.0.1 -i 1 -c 2", 5)
                 ping_cnt += 1
             PrintToLog("SmokeTest:: ##### case 14 : distributed test start #####")
@@ -586,11 +586,19 @@ if __name__ == "__main__":
                 fs.close()
             except Exception as reason:
                 PrintToLog("SmokeTest:: task_log.log is not exist!")
-                PrintToLog("SmokeTest:: error:testcase 14, distributed is failed!")
+                PrintToLog("SmokeTest:: error:testcase 14, distributed failed!")
+                if len(fail_idx_list) != 0:
+                    PrintToLog("SmokeTest:: error: name {}, index {}, these testcase is failed".format(fail_name_list,\
+                    fail_idx_list))
+                SysExit()
             if distributed_result == 1:
                 PrintToLog("SmokeTest:: testcase 14, distributed is ok!")
             else:
-                PrintToLog("SmokeTest:: error:testcase 14, distributed is failed!")
+                PrintToLog("SmokeTest:: error:testcase 14, distributed failed!")
+                if len(fail_idx_list) != 0:
+                    PrintToLog("SmokeTest:: error: name {}, index {}, these testcase is failed".format(fail_name_list,\
+                    fail_idx_list))
+                SysExit()
 
     EnterShellCmd("cd /data/log/faultlog/temp && tar -cf after_test_crash_log_{}.tar cppcrash*".format(args.device_num))
     GetFileFromDev("/data/log/faultlog/temp/after_test_crash_log_{}.tar".format(args.device_num), \
@@ -640,9 +648,7 @@ if __name__ == "__main__":
         else:
             PrintToLog("SmokeTest:: error: name {}, index {}, these testcase is failed".format(fail_name_list,\
             fail_idx_list))
-            PrintToLog("SmokeTest:: SmokeTest find some key problems!")
-            PrintToLog("SmokeTest:: End of check, test failed!")
-            sys.exit(98)
+            SysExit()
     else:
         PrintToLog("SmokeTest:: all testcase is ok")
         PrintToLog("SmokeTest:: End of check, test succeeded!")
