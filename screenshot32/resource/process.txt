@@ -44,7 +44,6 @@ hiview
 telephony
 usb_service
 camera_service
-thermal
 foundation
 hdcd
 disp_gralloc_host
