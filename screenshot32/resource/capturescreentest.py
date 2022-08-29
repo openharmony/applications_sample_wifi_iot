@@ -551,7 +551,6 @@ if __name__ == "__main__":
             while "2 packets transmitted, 2 received" not in ping_result and ping_cnt < 60:
                 ping_result = EnterShellCmd("ping 192.168.0.2 -i 1 -c 2", 5)
                 ping_cnt += 1
-            PrintToLog("SmokeTest:: ##### case 14 : distributed test start #####")
             if len(fail_idx_list) != 0:
                 PrintToLog("SmokeTest:: error: name {}, index {}, these testcase is failed".format(fail_name_list,\
                 fail_idx_list))

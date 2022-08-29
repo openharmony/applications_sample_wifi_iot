@@ -76,7 +76,9 @@ class DistributedTest(TestCase):
         time.sleep(2)
         # 拉起远端设备
         CommonOH.touchByType(self.Phone1, "image", index=1)
-        CommonOH.touchByType(self.Phone1, "input", index=1)
+        time.sleep(3)
+        CommonOH.click(self.Phone1, 580, 1090)
+        CommonOH.click(self.Phone1, 580, 1090)
         # 设备二授权
         time.sleep(2)
         CommonOH.click(self.Phone2, 500, 706)
