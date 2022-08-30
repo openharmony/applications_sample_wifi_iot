@@ -589,7 +589,6 @@ if __name__ == "__main__":
                 if len(fail_idx_list) != 0:
                     PrintToLog("SmokeTest:: error: name {}, index {}, these testcase is failed".format(fail_name_list,\
                     fail_idx_list))
-                SysExit()
             if distributed_result == 1:
                 PrintToLog("SmokeTest:: testcase 14, distributed is ok!")
             else:
@@ -597,7 +596,6 @@ if __name__ == "__main__":
                 if len(fail_idx_list) != 0:
                     PrintToLog("SmokeTest:: error: name {}, index {}, these testcase is failed".format(fail_name_list,\
                     fail_idx_list))
-                SysExit()
 
     EnterShellCmd("cd /data/log/faultlog/temp && tar -cf after_test_crash_log_{}.tar cppcrash*".format(args.device_num))
     GetFileFromDev("/data/log/faultlog/temp/after_test_crash_log_{}.tar".format(args.device_num), \
