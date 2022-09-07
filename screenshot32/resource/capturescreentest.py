@@ -212,7 +212,7 @@ if __name__ == "__main__":
         EnterShellCmd("mkdir -p /data/screen_test/train_set")
         SendFileToDev(os.path.normpath(os.path.join(args.tools_path, "resource/printscreen")), "/data/screen_test/")
         EnterShellCmd("chmod 777 /data/screen_test/printscreen")
-        rmlockcnt = 5
+        rmlockcnt = 3
         while rmlockcnt:
             EnterShellCmd("uinput -T -m 425 1000 425 400;power-shell wakeup;uinput -T -m 425 400 425 1000;\
             power-shell setmode 602;uinput -T -m 425 1000 425 400;", 1)

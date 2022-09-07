@@ -42,7 +42,6 @@ distributedsche
 installs
 hiview
 telephony
-usb_service
 camera_service
 thermal
 foundation
