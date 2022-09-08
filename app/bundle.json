@@ -21,7 +21,7 @@
         "ram": "",
         "deps": {
             "components": [
-                "utils_base"
+                "c_utils"
             ],
             "third_party": []
         },

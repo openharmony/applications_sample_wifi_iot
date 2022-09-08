@@ -18,5 +18,5 @@ static_library("example_demolink") {
     "helloworld.c",
   ]
 
-  include_dirs = [ "//utils/native/lite/include" ]
+  include_dirs = [ "//commonlibrary/utils_lite/include" ]
 }
