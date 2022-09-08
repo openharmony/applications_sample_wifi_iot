@@ -91,16 +91,12 @@ class DistributedTest(TestCase):
         CommonOH.wake(self.Phone1)
         # 设置不息屏
         CommonOH.hdc_std(self.Phone1, 'shell "power-shell setmode 602"')
-        # 设置 phone1 ip
-        CommonOH.hdc_std(self.Phone1, "shell ifconfig eth0 192.168.0.1")
 
     def net_connect2(self):
         # 点亮屏幕
         CommonOH.wake(self.Phone2)
         # 设置不息屏
         CommonOH.hdc_std(self.Phone2, 'shell "power-shell setmode 602"')
-        # 设置 phone1 ip
-        CommonOH.hdc_std(self.Phone2, "shell ifconfig eth0 192.168.0.2")
 
     def teardown(self):
         # 切入后台，结束进程
