@@ -562,7 +562,7 @@ if __name__ == "__main__":
             while "2 packets transmitted, 2 received" not in ping_result and ping_cnt < 60:
                 ping_result = EnterShellCmd("ping 192.168.0.1 -i 1 -c 2", 5)
                 ping_cnt += 1
-            PrintToLog("SmokeTest:: ##### case 14 : distributed test start #####")
+            PrintToLog("SmokeTest:: ##### case 13 : distributed test start #####")
             execute_path = os.path.normpath(os.path.join(args.tools_path, "DistributedTest"))
             PrintToLog("SmokeTest:: execute_path {}".format(execute_path))
             os.system("cd {} && python main.py run -l DistributedTest".format(execute_path))
@@ -585,17 +585,19 @@ if __name__ == "__main__":
                 fs.close()
             except Exception as reason:
                 PrintToLog("SmokeTest:: task_log.log is not exist!")
-                PrintToLog("SmokeTest:: error:testcase 14, distributed failed!")
+                PrintToLog("SmokeTest:: error:testcase 13, distributed failed!")
                 if len(fail_idx_list) != 0:
                     PrintToLog("SmokeTest:: error: name {}, index {}, these testcase is failed".format(fail_name_list,\
                     fail_idx_list))
+                SysExit()
             if distributed_result == 1:
-                PrintToLog("SmokeTest:: testcase 14, distributed is ok!")
+                PrintToLog("SmokeTest:: testcase 13, distributed is ok!")
             else:
-                PrintToLog("SmokeTest:: error:testcase 14, distributed failed!")
+                PrintToLog("SmokeTest:: error:testcase 13, distributed failed!")
                 if len(fail_idx_list) != 0:
                     PrintToLog("SmokeTest:: error: name {}, index {}, these testcase is failed".format(fail_name_list,\
                     fail_idx_list))
+                SysExit()
 
     EnterShellCmd("cd /data/log/faultlog/temp && tar -cf after_test_crash_log_{}.tar cppcrash*".format(args.device_num))
     GetFileFromDev("/data/log/faultlog/temp/after_test_crash_log_{}.tar".format(args.device_num), \
