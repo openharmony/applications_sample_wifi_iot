@@ -114,7 +114,7 @@
         "entry": "aa start -a MainAbility -b com.ohos.note",
         "kill_note": ["killall com.ohos.note"],
         "all_actions": [
-            [2, "permisson_ok-x-y"], [2, "permisson_ok-x-y"], [2, "permisson_ok-x-y"], [2, "permisson_ok-x-y"], [2, "permisson_ok-x-y"], [2, "shot_cmd"], [1, "cmp_cmd-level"], [1, "kill_note"]
+            [2, "permisson_ok-x-y"], [2, "permisson_ok-x-y"], [2, "permisson_ok-x-y"], [2, "permisson_ok-x-y"], [2, "permisson_ok-x-y"], [2, "shot_cmd"], [1, "cmp_cmd-level"], [2, "recent-x-y"], [1, "recent_del-x-y"]
         ]
     },
     {
