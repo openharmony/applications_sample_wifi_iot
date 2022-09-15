@@ -27,14 +27,15 @@ def PrintToLog(str):
     time = datetime.datetime.now()
     str = "[{}] {}".format(time, str)
     print(str)
-    with open(os.path.join(args.save_path, 'shot_test_{}.log'.format(args.device_num)), mode='a', encoding='utf-8') as log_file:
+    with open(os.path.join(args.save_path, 'shot_test_{}.log'.format(args.device_num)),\
+    mode='a', encoding='utf-8') as log_file:
         console = sys.stdout
         sys.stdout = log_file
         print(str)
         sys.stdout = console
     log_file.close()
 
-def EnterCmd(mycmd, waittime = 0, printresult = 1):
+def EnterCmd(mycmd, waittime=0, printresult=1):
     if mycmd == "":
         return
     global CmdRetryCnt
@@ -56,7 +57,8 @@ def EnterCmd(mycmd, waittime = 0, printresult = 1):
             CmdRetryCnt += 1
             p.kill()
     if printresult == 1:
-        with open(os.path.join(args.save_path, 'shot_test_{}.bat'.format(args.device_num)), mode='a', encoding='utf-8') as cmd_file:
+        with open(os.path.join(args.save_path, 'shot_test_{}.bat'.format(args.device_num)),\
+        mode='a', encoding='utf-8') as cmd_file:
             cmd_file.write(mycmd + '\n')
         cmd_file.close()
         PrintToLog(mycmd)
@@ -65,12 +67,13 @@ def EnterCmd(mycmd, waittime = 0, printresult = 1):
     if waittime != 0:
         time.sleep(waittime)
         if printresult == 1:
-            with open(os.path.join(args.save_path, 'shot_test_{}.bat'.format(args.device_num)), mode='a', encoding='utf-8') as cmd_file:
+            with open(os.path.join(args.save_path, 'shot_test_{}.bat'.format(args.device_num)),\
+            mode='a', encoding='utf-8') as cmd_file:
                 cmd_file.write("ping -n {} 127.0.0.1>null\n".format(waittime))
             cmd_file.close()
     return result
 
-def EnterShellCmd(shellcmd, waittime = 0, printresult = 1):
+def EnterShellCmd(shellcmd, waittime=0, printresult=1):
     if shellcmd == "":
         return
     cmd = "hdc_std -t {} shell \"{}\"".format(args.device_num, shellcmd)
@@ -78,7 +81,8 @@ def EnterShellCmd(shellcmd, waittime = 0, printresult = 1):
 
 def SysExit():
     EnterShellCmd("cd /data/log/faultlog/temp && tar -cf after_test_crash_log_{}.tar cppcrash*".format(args.device_num))
-    GetFileFromDev("/data/log/faultlog/temp/after_test_crash_log_{}.tar".format(args.device_num), os.path.normpath(args.save_path))
+    GetFileFromDev("/data/log/faultlog/temp/after_test_crash_log_{}.tar".format(args.device_num),\
+    os.path.normpath(args.save_path))
     sys.exit(99)
 
 def SendFileToDev(src, dst):
@@ -111,9 +115,11 @@ def ConnectToWifi(tools_path):
     while cnt:
         try:
             PrintToLog("hdc_std shell ./data/l2tool/busybox udhcpc -i wlan0 -s /data/l2tool/dhcpc.sh")
-            p = subprocess.check_output(shlex.split("hdc_std -t {} shell ./data/l2tool/busybox udhcpc -i wlan0 -s /data/l2tool/dhcpc.sh".format(args.device_num)), timeout=8)
+            p = subprocess.check_output(shlex.split("hdc_std -t {} shell ./data/l2tool/busybox udhcpc -i\
+            wlan0 -s /data/l2tool/dhcpc.sh".format(args.device_num)), timeout=8)
             PrintToLog(p.decode(encoding="utf-8"))
-            with open(os.path.join(args.save_path, 'shot_test_{}.bat'.format(args.device_num)), mode='a', encoding='utf-8') as cmd_file:
+            with open(os.path.join(args.save_path, 'shot_test_{}.bat'.format(args.device_num)),\
+            mode='a', encoding='utf-8') as cmd_file:
                 cmd_file.write('hdc_std shell ./data/l2tool/busybox udhcpc -i wlan0 -s /data/l2tool/dhcpc.sh' + '\n')
             cmd_file.close()
             ret_code = 0
@@ -169,23 +175,27 @@ if __name__ == "__main__":
         EnterShellCmd("chmod 777 /data/screen_test/printscreen")
         rmlockcnt = 5
         while rmlockcnt:
-            EnterShellCmd("uinput -T -m 425 1000 425 400;power-shell wakeup;uinput -T -m 425 400 425 1000;power-shell setmode 602;uinput -T -m 425 1000 425 400;", 1)
+            EnterShellCmd("uinput -T -m 425 1000 425 400;power-shell wakeup;uinput -T -m 425 400 425 1000;\
+            power-shell setmode 602;uinput -T -m 425 1000 425 400;", 1)
             rmlockcnt -= 1
 
         EnterShellCmd("hilog -w stop", 1)
         EnterShellCmd("cd /data/log/hilog && tar -cf system_start_log_{}.tar *".format(args.device_num), 1)
         GetFileFromDev("/data/log/hilog/system_start_log_{}.tar".format(args.device_num), args.save_path)
         #print(os.path.normpath(os.path.join(args.anwser_path, "launcher.pngraw")))
-        SendFileToDev(os.path.normpath(os.path.join(args.anwser_path, "launcher.pngraw")), "/data/screen_test/train_set")
+        SendFileToDev(os.path.normpath(os.path.join(args.anwser_path, "launcher.pngraw")),\
+        "/data/screen_test/train_set")
         EnterShellCmd("/data/screen_test/printscreen -f /data/screen_test/launcher_{}.png".format(args.device_num), 1)
         GetFileFromDev("/data/screen_test/launcher_{}.pngraw".format(args.device_num), args.save_path)
         GetFileFromDev("/data/screen_test/launcher_{}.png".format(args.device_num), args.save_path)
         connection_judgment()
-        cmp_launcher = "cmp -l /data/screen_test/launcher_{}.pngraw /data/screen_test/train_set/launcher.pngraw | wc -l".format(args.device_num)
+        cmp_launcher = "cmp -l /data/screen_test/launcher_{}.pngraw\
+        /data/screen_test/train_set/launcher.pngraw | wc -l".format(args.device_num)
         p = EnterShellCmd(cmp_launcher, 1)
         num = re.findall(r'[-+]?\d+', p)
         PrintToLog(num)
-        if type(num) == list and len(num) > 0 and int(num[0]) < 184320 and p.find('No such file or directory', 0, len(p)) == -1:
+        if type(num) == list and len(num) > 0 and int(num[0]) < 184320 and\
+        p.find('No such file or directory', 0, len(p)) == -1:
             PrintToLog("remove lock is ok!\n\n")
             break
         elif rebootcnt >= 1:
@@ -258,7 +268,8 @@ if __name__ == "__main__":
         capture_screen_cmd = "/data/screen_test/printscreen -f /data/screen_test/{}_{}"
         cmp_cmd = "cmp -l /data/screen_test/{}_{} /data/screen_test/train_set/{} | wc -l"
         PrintToLog("\n\n########## case {} : {} test start ##############".format(idx, single_app['app_name']))
-        with open(os.path.join(args.save_path, 'shot_test_{}.bat'.format(args.device_num)), mode='a', encoding='utf-8') as cmd_file:
+        with open(os.path.join(args.save_path, 'shot_test_{}.bat'.format(args.device_num)),\
+        mode='a', encoding='utf-8') as cmd_file:
             cmd_file.write("\n\n::::::case {} --- {} test start \n".format(idx, single_app['app_name']))
         cmd_file.close()
         testcnt = 3
@@ -267,7 +278,8 @@ if __name__ == "__main__":
             checkok = 1
             if testcnt != 3:
                 PrintToLog(">>>>>>>>>>>>>>>>>>>>>>>Try again:\n")
-                with open(os.path.join(args.save_path, 'shot_test_{}.bat'.format(args.device_num)), mode='a', encoding='utf-8') as cmd_file:
+                with open(os.path.join(args.save_path, 'shot_test_{}.bat'.format(args.device_num)),\
+                mode='a', encoding='utf-8') as cmd_file:
                     cmd_file.write("\n::::::Last failed, Try again \n")
                 cmd_file.close()
             EnterShellCmd("rm /data/log/hilog/*;hilog -r;hilog -w start -l 400000000 -m none", 1)
@@ -294,7 +306,8 @@ if __name__ == "__main__":
                     next_cmd = ""
                     sys.stdout.flush()
                     EnterShellCmd("rm /data/train_set/{}".format(raw_pic_name), 1)
-                    SendFileToDev(os.path.normpath(os.path.join(args.anwser_path, raw_pic_name)), "/data/screen_test/train_set")
+                    SendFileToDev(os.path.normpath(os.path.join(args.anwser_path, raw_pic_name)),\
+                    "/data/screen_test/train_set")
                     new_cmp_cmd = cmp_cmd.format(4 - testcnt, raw_pic_name, raw_pic_name)
                     if len(single_action) == 3:
                         tolerance = single_action[2]
@@ -305,7 +318,8 @@ if __name__ == "__main__":
                     #PrintToLog(no_such)
                     num = re.findall(r'[-+]?\d+', p)
                     PrintToLog(num)
-                    if type(num) == list and len(num) > 0 and int(num[0]) < tolerance and p.find('No such file or directory', 0, len(p)) == -1:
+                    if type(num) == list and len(num) > 0 and int(num[0]) < tolerance and\
+                    p.find('No such file or directory', 0, len(p)) == -1:
                         if testok == 0:
                             testok = 1
                         PrintToLog("{} screenshot check is ok!\n\n".format(raw_pic_name))
@@ -322,15 +336,18 @@ if __name__ == "__main__":
                 elif type(single_action[1]) == str and single_action[1] == 'install_hap':
                     next_cmd = ""
                     if len(single_action) == 3:
-                        EnterCmd("hdc_std -t {} install \"{}\"".format(args.device_num, os.path.normpath(os.path.join(args.tools_path, single_action[2]))))
+                        EnterCmd("hdc_std -t {} install \"{}\"".format(args.device_num,\
+                        os.path.normpath(os.path.join(args.tools_path, single_action[2]))))
                 elif type(single_action[1]) == str and single_action[1] == 'get_file_from_dev':
                     next_cmd = ""
                     if len(single_action) == 3:
-                        EnterCmd("hdc_std -t {} file recv \"{}\" \"{}\"".format(args.device_num, single_action[2], os.path.normpath(args.save_path)))
+                        EnterCmd("hdc_std -t {} file recv \"{}\" \"{}\"".format(args.device_num,\
+                        single_action[2], os.path.normpath(args.save_path)))
                 elif type(single_action[1]) == str and single_action[1] == 'send_file_to_dev':
                     next_cmd = ""
                     if len(single_action) == 4:
-                        EnterCmd("hdc_std -t {} file send \"{}\" \"{}\"".format(args.device_num, os.path.normpath(os.path.join(args.tools_path, single_action[2])), single_action[3]))
+                        EnterCmd("hdc_std -t {} file send \"{}\" \"{}\"".format(args.device_num,\
+                        os.path.normpath(os.path.join(args.tools_path, single_action[2])), single_action[3]))
                 elif type(single_action[1]) == str and single_action[1] == 'connect_wifi':
                     next_cmd = ""
                     ConnectToWifi(args.tools_path)
@@ -342,27 +359,32 @@ if __name__ == "__main__":
                         findsome = result.find(single_action[2], 0, len(result))
                         if findsome != -1:
                             checkok = 1
-                            PrintToLog("\"{}\" check execut result is ok, find process \"{}\"!\n".format(single_action[1], single_action[2]))
+                            PrintToLog("\"{}\" check execut result is ok, find\
+                            process \"{}\"!\n".format(single_action[1], single_action[2]))
                         else:
                             checkok = -1
-                            PrintToLog("\"{}\" check execut result is not ok, not find process \"{}\"!\n".format(single_action[1], single_action[2]))
+                            PrintToLog("\"{}\" check execut result is not ok, not find\
+                            process \"{}\"!\n".format(single_action[1], single_action[2]))
                         sys.stdout.flush()
                 #process_crash_check
                 elif type(single_action[1]) == str and single_action[1] == 'process_crash_check':
                     next_cmd = ""
                     if len(single_action) == 3:
-                        p = EnterShellCmd("cd /data/log/faultlog/temp && grep \"Process name\" -rnw ./", single_action[0])
+                        p = EnterShellCmd("cd /data/log/faultlog/temp && grep \"Process name\" -rnw ./",\
+                        single_action[0])
                         result = "".join(p)
                         findsome = result.find(single_action[2], 0, len(result))
                         if findsome != -1:
                             testok = -1
-                            PrintToLog("\"{}\" ERROR:find fatal crash \"{}\"!\n".format(single_action[1], single_action[2]))
+                            PrintToLog("\"{}\" ERROR:find fatal crash \"{}\"!\n".format(single_action[1],\
+                            single_action[2]))
                             PrintToLog("SmokeTest find some fatal problems!")
                             PrintToLog("End of check, test failed!")
                             SysExit()
                         else:
                             testok = 1
-                            PrintToLog("\"{}\" check execut result is ok, not find fatal crash \"{}\"!\n".format(single_action[1], single_action[2]))
+                            PrintToLog("\"{}\" check execut result is ok, not find fatal\
+                            crash \"{}\"!\n".format(single_action[1], single_action[2]))
                         sys.stdout.flush()
                 #other cmd handle
                 elif type(single_action[1]) == str:
@@ -379,10 +401,12 @@ if __name__ == "__main__":
                             findsome = result.find(target_[1], 0, len(result))
                             if findsome != -1:
                                 testok = 1
-                                PrintToLog("\"{}\" check execut result is ok, find \"{}\"!\n".format(target_[0], target_[1]))
+                                PrintToLog("\"{}\" check execut result is ok, find \"{}\"!\n".format(target_[0],\
+                                target_[1]))
                             else:
                                 testok = -1
-                                PrintToLog("\"{}\" check execut result is not ok, not find \"{}\"!\n".format(target_[0], target_[1]))
+                                PrintToLog("\"{}\" check execut result is not ok, not find \"{}\"!\n".format(target_[0],\
+                                target_[1]))
                             sys.stdout.flush()
                     #this cmd only is a name of x,y postion, to get x,y an click it
                     else:
@@ -422,17 +446,6 @@ if __name__ == "__main__":
         if smoke_first_failed == 'launcher':
             break
 
-    medialibrarydata_pidnum = EnterShellCmd("pgrep -f com.ohos.medialibrary.medialibrarydata", 1)
-    medialibrarydata_pidnum = medialibrarydata_pidnum.strip()
-    sandbox_file = EnterShellCmd("nsenter -t {} -m sh;cd /storage/media/100/local/;ls;exit".format(medialibrarydata_pidnum), 1)
-    if "files" not in sandbox_file:
-        PrintToLog("Error: can not find sandbox path : /storage/media/100/local/files")
-        PrintToLog("SmokeTest find some fatal problems!")
-        PrintToLog("End of check, test failed!")
-        SysExit()
-    else:
-        PrintToLog("success: find sandbox path : /storage/media/100/local/files")
-
     #key processes second check, and cmp to first check
     PrintToLog("\n\n########## Second check key processes start ##############")
     second_check_lose_process = []
@@ -469,7 +482,8 @@ if __name__ == "__main__":
         PrintToLog("Second processes check is ok\n")
 
     EnterShellCmd("cd /data/log/faultlog/temp && tar -cf after_test_crash_log_{}.tar cppcrash*".format(args.device_num))
-    GetFileFromDev("/data/log/faultlog/temp/after_test_crash_log_{}.tar".format(args.device_num), os.path.normpath(args.save_path))
+    GetFileFromDev("/data/log/faultlog/temp/after_test_crash_log_{}.tar".format(args.device_num),\
+    os.path.normpath(args.save_path))
     EnterShellCmd("cd /data/log/faultlog/temp && find . -name cppcrash*", 2)
     EnterShellCmd("cd /data/log/faultlog/temp && grep \"Process name\" -rnw ./", 2)
 
@@ -486,15 +500,19 @@ if __name__ == "__main__":
             with open(os.path.normpath(os.path.join(args.tools_path, "reboot.txt")), mode='w') as f:
                 f.write("reboot")
             f.close()
-            PrintToLog("ERROR: name {}, index {}, these testcase is failed, reboot and try!!".format(fail_name_list, fail_idx_list))
+            PrintToLog("ERROR: name {}, index {}, these testcase is failed, reboot and try!!".format(fail_name_list,\
+            fail_idx_list))
             EnterShellCmd("rm -rf /data/*;reboot")
             reboot_result_list = EnterCmd("hdc_std list targets", 2)
             number = 0
-            while "7001005458323933328a" not in reboot_result_list and number < 15:
+            while args.device_num not in reboot_result_list and number < 15:
                 reboot_result_list = EnterCmd("hdc_std list targets", 2)
                 number += 1
             EnterShellCmd("rm /data/log/hilog/*;hilog -r;hilog -w start -l 400000000 -m none", 1)
-            py_cmd = os.system("python {}\\resource\\capturescreentest.py --config {}\\resource\\app_capture_screen_test_config.json --anwser_path {} --save_path {}\\reboot --tools_path {} --device_num {} --test_num \"{}\"".format(args.tools_path, args.tools_path, args.anwser_path, args.save_path, args.tools_path, args.device_num, reboot_test_num))
+            py_cmd = os.system("python {}\\resource\\capturescreentest.py --config\
+            {}\\resource\\app_capture_screen_test_config.json --anwser_path {} --save_path {}\\reboot\
+            --tools_path {} --device_num {} --test_num \"{}\"".format(args.tools_path, args.tools_path,\
+            args.anwser_path, args.save_path, args.tools_path, args.device_num, reboot_test_num))
             if py_cmd == 0:
                 sys.exit(0)
             elif py_cmd == 98:
