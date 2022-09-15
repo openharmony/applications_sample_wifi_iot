@@ -422,17 +422,6 @@ if __name__ == "__main__":
         if smoke_first_failed == 'launcher':
             break
 
-    medialibrarydata_pidnum = EnterShellCmd("pgrep -f com.ohos.medialibrary.medialibrarydata", 1)
-    medialibrarydata_pidnum = medialibrarydata_pidnum.strip()
-    sandbox_file = EnterShellCmd("nsenter -t {} -m sh;cd /storage/media/100/local/;ls;exit".format(medialibrarydata_pidnum), 1)
-    if "files" not in sandbox_file:
-        PrintToLog("Error: can not find sandbox path : /storage/media/100/local/files")
-        PrintToLog("SmokeTest find some fatal problems!")
-        PrintToLog("End of check, test failed!")
-        SysExit()
-    else:
-        PrintToLog("success: find sandbox path : /storage/media/100/local/files")
-
     #key processes second check, and cmp to first check
     PrintToLog("\n\n########## Second check key processes start ##############")
     second_check_lose_process = []
@@ -490,7 +479,7 @@ if __name__ == "__main__":
             EnterShellCmd("rm -rf /data/*;reboot")
             reboot_result_list = EnterCmd("hdc_std list targets", 2)
             number = 0
-            while "7001005458323933328a" not in reboot_result_list and number < 15:
+            while args.device_num not in reboot_result_list and number < 15:
                 reboot_result_list = EnterCmd("hdc_std list targets", 2)
                 number += 1
             EnterShellCmd("rm /data/log/hilog/*;hilog -r;hilog -w start -l 400000000 -m none", 1)
