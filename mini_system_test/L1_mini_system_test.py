@@ -86,7 +86,8 @@ if __name__ == "__main__":
         PrintToLog("{} is open failed".format(com_port))
         PrintToLog("End of check, test failed!")
         sys.exit(99)
-
+        
+    res = com_port.write("free".encode('utf-8'));
     read_com_thread = threading.Thread(target=ReadFromComPort, args=(com_port, 10))
     read_com_thread.setDaemon(True)
     print('read wait:')
@@ -136,6 +137,17 @@ if __name__ == "__main__":
     else:
         PrintToLog('not found softbus_server process')
         PrintToLog("End of check, test failed!")
+        sys.exit(99)
+    mem_find = re.findall('Mem:\s*\d*\s*\d*\s*\d*\s*\d*', com_output)
+    print(mem_find)
+    if len(mem_find) > 0:
+        mem_size = int(mem_find[0].split()[2]) / 1024 / 1024
+    else:
+        PrintToLog('Error:can find memory usage info!')
+        sys.exit(99)
+    if mem_size > 25:
+        PrintToLog(
+            'Error:memory usage is over the upper limit(25M),now is {:.2f}'.format(mem_size))
         sys.exit(99)
 
     target_dir = os.path.normpath(os.path.join(args.archive_path, "rootfs"))
