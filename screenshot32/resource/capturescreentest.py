@@ -24,6 +24,7 @@ import subprocess
 import shlex
 import datetime
 import sqlite3
+import shutil
 
 def PrintToLog(str):
     time = datetime.datetime.now()
@@ -96,6 +97,9 @@ def SendFileToDev(src, dst):
 def GetFileFromDev(src, dst):
     cmd = "hdc_std -t {} file recv \"{}\" \"{}\"".format(args.device_num, src, dst)
     return EnterCmd(cmd, 1, 1)
+
+def is_image_file(filename):
+    return any(filename.endswith(extension) for extension in IMG_EXTENSIONS)
 
 def ImageCheck(str, testnum=1):
     conn = sqlite3.connect(str)
@@ -204,7 +208,10 @@ if __name__ == "__main__":
     cmp_status = 0
     global_pos = all_app[0]
 
-    #rmlock
+    IMG_EXTENSIONS = [
+    '.jpg', '.JPG', '.jpeg', '.JPEG', '.png', '.PNG', 
+    ]
+
     rebootcnt = 2
     while rebootcnt:
         rebootcnt -= 1
@@ -252,7 +259,6 @@ if __name__ == "__main__":
         text = f.read()
         two_check_process_list = text.split('#####')[1].split()[0:-1]
         other_process_list = text.split('#####')[2].split()
-        #for pname in two_check_process_list + other_process_list:
         for pname in two_check_process_list:
             pids = EnterCmd("hdc_std -t {} shell pidof {}".format(args.device_num, pname), 0, 1)
             try:
@@ -323,7 +329,6 @@ if __name__ == "__main__":
             raw_pic_name = ''
             pic_name = ''
             for single_action in single_app['all_actions']:
-                #shot_cmd is stable, different to other cmd,so handle it specialy
                 if type(single_action[1]) == str and single_action[1] == 'shot_cmd':
                     if len(single_action) == 3:
                         pic_name = "{}{}".format(single_action[2], ".png")
@@ -335,7 +340,6 @@ if __name__ == "__main__":
                     EnterShellCmd(capture_screen_cmd.format(4 - testcnt, pic_name), 1)
                     GetFileFromDev("/data/screen_test/{}_{}".format(4 - testcnt, pic_name), args.save_path)
                     next_cmd = ""
-                #cmp_cmd-level is stable, different to other cmd,so handle it specialy
                 elif type(single_action[1]) == str and single_action[1] == 'cmp_cmd-level':
                     next_cmd = ""
                     sys.stdout.flush()
@@ -349,7 +353,6 @@ if __name__ == "__main__":
                         tolerance = global_pos['cmp_cmd-level'][1]
                     PrintToLog("SmokeTest:: start to contrast screenshot")
                     p = EnterShellCmd(new_cmp_cmd, single_action[0])
-                    #no_such = re.findall(r'No such file or directory', p)
                     num = re.findall(r'[-+]?\d+', p)
                     PrintToLog("SmokeTest:: contrast pixel difference {}".format(num))
                     if type(num) == list and len(num) > 0 and int(num[0]) < tolerance and\
@@ -413,7 +416,6 @@ if __name__ == "__main__":
                             PrintToLog("SmokeTest:: \"{}\" failed, not find process \"{}\"!".format(single_action[1],\
                             single_action[2]))
                         sys.stdout.flush()
-                #process_crash_check
                 elif type(single_action[1]) == str and single_action[1] == 'process_crash_check':
                     next_cmd = ""
                     if len(single_action) == 3:
@@ -431,13 +433,11 @@ if __name__ == "__main__":
                             PrintToLog("SmokeTest:: \"{}\" result is ok, not find fatal\
                             crash \"{}\"!".format(single_action[1], single_action[2]))
                         sys.stdout.flush()
-                #other cmd handle
                 elif type(single_action[1]) == str:
                     if single_action[1] not in single_app.keys():
                         target_ = global_pos[single_action[1]]
                     else:
                         target_ = single_app[single_action[1]]
-                    #this cmd is real cmd,and have a except answer
                     if type(target_[0]) == str:
                         next_cmd = ""
                         p = EnterShellCmd(target_[0], single_action[0])
@@ -453,10 +453,8 @@ if __name__ == "__main__":
                                 PrintToLog("SmokeTest:: \"{}\" result is not ok, not find \"{}\"!".format(target_[0],\
                                 target_[1]))
                             sys.stdout.flush()
-                    #this cmd only is a name of x,y postion, to get x,y an click it
                     else:
                         next_cmd = "uinput -M -m {} {} -c 0".format(target_[0], target_[1])
-                #uinput x,y postion, to click it
                 else:
                     next_cmd = "uinput -M -m {} {} -c 0".format(single_action[1], single_action[2])
                 EnterShellCmd(next_cmd, single_action[0])
@@ -497,10 +495,8 @@ if __name__ == "__main__":
     else:
         PrintToLog("SmokeTest:: success: find sandbox path : /storage/media/local/files")
 
-    #key processes second check, and cmp to first check
     PrintToLog("\nSmokeTest:: ########## Second check key processes start ##############")
     second_check_lose_process = []
-    #for pname in two_check_process_list + other_process_list:
     for pname in two_check_process_list:
         pids = EnterCmd("hdc_std -t {} shell pidof {}".format(args.device_num, pname), 0, 1)
         try:
@@ -529,7 +525,6 @@ if __name__ == "__main__":
     pr_analysis = args.pr_url
     PrintToLog("SmokeTest:: get pr: {}".format(args.pr_url))
     if "openharmony" in pr_analysis:
-        #distributed smoketest
         EnterShellCmd("param set persist.ace.testmode.enabled 1", 1)
         PrintToLog("SmokeTest:: close selinux")
         EnterShellCmd("mount -o rw,remount /", 1)
@@ -571,6 +566,12 @@ if __name__ == "__main__":
             task_file = "task_log.log"
             file_name = ''
             distributed_result = 0
+            for root, dirs, files in os.walk(report_path):
+                for file in files:
+                    file_path = os.path.join(root, file)
+                    if is_image_file(file_path):
+                        shutil.copy2(file_path, args.save_path)
+                        PrintToLog("SmokeTest:: send {} to save_path Successfully".format(file_path))
             for root, dirs, files in os.walk(report_path):
                 if task_file in files:
                     file_name = os.path.join(root, task_file)

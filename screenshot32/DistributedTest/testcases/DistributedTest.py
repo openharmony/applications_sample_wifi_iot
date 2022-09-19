@@ -62,10 +62,9 @@ class DistributedTest(TestCase):
             else:
                 j = int(i) - 1
                 CommonOH.click(self.Phone1, 46 + j * 70, 778)
-        CommonOH.click(self.Phone1, 300, 612)
         time.sleep(1)
         # 确定
-        CommonOH.click(self.Phone1, 500, 690)
+        CommonOH.click(self.Phone1, 500, 530)
 
     def sub_distributed_smoke_testcase_0300(self):
         # 切入后台，结束进程
