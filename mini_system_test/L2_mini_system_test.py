@@ -133,6 +133,14 @@ if __name__ == "__main__":
     else:
         PrintToLog("First processes check is ok\n")
 
+    # check processes usage
+    res = EnterCmd("hdc_std -t {} shell hidumper --mem".format(args.device_num), 0, 1)
+    process_usage = int(res.split(':')[-1].split()[0]) / 1024
+    if process_usage > 40:
+        PrintToLog(
+            "ERROR: Processes usage cannot be greater than 40M, but currently it's actually %.2fM" % process_usage)
+        sys.exit(99)
+
     time.sleep(10)
 
     #key processes second check, and cmp to first check
