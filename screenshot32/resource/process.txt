@@ -43,7 +43,6 @@ installs
 hiview
 telephony
 camera_service
-thermal
 foundation
 hdcd
 disp_gralloc_host
