@@ -138,7 +138,7 @@ def ImageCheck(str, testnum=1):
 def ConnectionJudgment():
     connection_status = EnterCmd("hdc_std list targets", 2)
     connection_cnt = 0
-    while "7001005458323933328a" not in connection_status and connection_cnt < 15:
+    while args.device_num not in connection_status and connection_cnt < 15:
         connection_status = EnterCmd("hdc_std list targets", 2)
         connection_cnt += 1
     if connection_cnt == 15:
@@ -321,7 +321,7 @@ if __name__ == "__main__":
                 mode='a', encoding='utf-8') as cmd_f:
                     cmd_f.write("\nSmokeTest::::::Last failed, try again \n")
                 cmd_f.close()
-            if idx == 2 or idx == 3 or idx == 8:
+            if idx == 2 or idx == 8:
                 testcnt = 1
             if single_app['entry'] != "":
                 EnterShellCmd(call_app_cmd, 5)
@@ -531,10 +531,13 @@ if __name__ == "__main__":
         EnterShellCmd("sed -i 's/enforcing/permissive/g' /system/etc/selinux/config", 1)
         EnterShellCmd("cat /system/etc/selinux/config | grep SELINUX=", 1)
         EnterShellCmd("reboot")
-        for i in range(6):
-            EnterCmd("hdc_std list targets", 5)
-        unlockcnt = 3
+        hdc_list = EnterCmd("hdc_std list targets", 3)
+        waitcnt = 0
+        while args.device_num not in hdc_list and waitcnt < 15:
+            hdc_list = EnterCmd("hdc_std list targets", 3)
+            waitcnt += 1
         PrintToLog("SmokeTest:: start remove lock")
+        unlockcnt = 3
         while unlockcnt:
             EnterShellCmd("uinput -T -m 425 1000 425 400;power-shell wakeup;\
             uinput -T -m 425 400 425 1000;power-shell setmode 602;uinput -T -m 425 1000 425 400;", 1)
@@ -550,6 +553,10 @@ if __name__ == "__main__":
                 PrintToLog("SmokeTest:: error: name {}, index {}, these testcase is failed".format(fail_name_list,\
                 fail_idx_list))
                 SysExit()
+            if ping_cnt == 60:
+                PrintToLog("SmokeTest:: Ping failed, timeout of 5 minutes")
+                PrintToLog("SmokeTest:: please check the testcase {}".format(fail_name_list))
+                SysExit()
         elif args.test_num == "2/2":
             EnterShellCmd("ifconfig eth0 192.168.0.2", 1)
             ping_result = EnterShellCmd("ping 192.168.0.1 -i 1 -c 2", 3)
@@ -557,9 +564,14 @@ if __name__ == "__main__":
             while "2 packets transmitted, 2 received" not in ping_result and ping_cnt < 60:
                 ping_result = EnterShellCmd("ping 192.168.0.1 -i 1 -c 2", 5)
                 ping_cnt += 1
+            if ping_cnt == 60:
+                PrintToLog("SmokeTest:: Ping failed, timeout of 5 minutes")
+                PrintToLog("SmokeTest:: please check the testcase {}".format(fail_name_list))
+                SysExit()
             PrintToLog("SmokeTest:: ##### case 13 : distributed test start #####")
             execute_path = os.path.normpath(os.path.join(args.tools_path, "DistributedTest"))
             PrintToLog("SmokeTest:: execute_path {}".format(execute_path))
+            EnterShellCmd("rm /data/log/hilog/*;hilog -r;hilog -w start -l 400000000 -m none", 1)
             os.system("cd {} && python main.py run -l DistributedTest".format(execute_path))
             report_path = os.path.normpath(os.path.join(args.tools_path, "DistributedTest\\reports"))
             PrintToLog("SmokeTest:: report_path {}".format(report_path))
@@ -586,11 +598,6 @@ if __name__ == "__main__":
                 fs.close()
             except Exception as reason:
                 PrintToLog("SmokeTest:: task_log.log is not exist!")
-                PrintToLog("SmokeTest:: error:testcase 13, distributed failed!")
-                if len(fail_idx_list) != 0:
-                    PrintToLog("SmokeTest:: error: name {}, index {}, these testcase is failed".format(fail_name_list,\
-                    fail_idx_list))
-                SysExit()
             if distributed_result == 1:
                 PrintToLog("SmokeTest:: testcase 13, distributed is ok!")
             else:
@@ -598,6 +605,9 @@ if __name__ == "__main__":
                 if len(fail_idx_list) != 0:
                     PrintToLog("SmokeTest:: error: name {}, index {}, these testcase is failed".format(fail_name_list,\
                     fail_idx_list))
+                EnterShellCmd("hilog -w stop", 1)
+                EnterShellCmd("cd /data/log/hilog && tar -cf distributed_log.tar *", 1)
+                GetFileFromDev("/data/log/hilog/distributed_log.tar", args.save_path)
                 SysExit()
 
     EnterShellCmd("cd /data/log/faultlog/temp && tar -cf after_test_crash_log_{}.tar cppcrash*".format(args.device_num))
