@@ -542,7 +542,7 @@ if __name__ == "__main__":
             EnterShellCmd("uinput -T -m 425 1000 425 400;power-shell wakeup;\
             uinput -T -m 425 400 425 1000;power-shell setmode 602;uinput -T -m 425 1000 425 400;", 1)
             unlockcnt -= 1
-        if args.test_num == "1/2":
+        if args.test_num == "2/2":
             EnterShellCmd("ifconfig eth0 192.168.0.1", 1)
             ping_result = EnterShellCmd("ping 192.168.0.2 -i 1 -c 2", 3)
             ping_cnt = 0
@@ -557,7 +557,7 @@ if __name__ == "__main__":
                 PrintToLog("SmokeTest:: Ping failed, timeout of 5 minutes")
                 PrintToLog("SmokeTest:: please check the testcase {}".format(fail_name_list))
                 SysExit()
-        elif args.test_num == "2/2":
+        elif args.test_num == "1/2":
             EnterShellCmd("ifconfig eth0 192.168.0.2", 1)
             ping_result = EnterShellCmd("ping 192.168.0.1 -i 1 -c 2", 3)
             ping_cnt = 0
