@@ -46,12 +46,12 @@ class DistributedTest(TestCase):
         CommonOH.touchByType(self.Phone1, "input", index=1)
         time.sleep(1)
         #确定
-        CommonOH.click(self.Phone2, 500, 620)
-        CommonOH.click(self.Phone2, 500, 620)
+        CommonOH.click(self.Phone2, 520, 520)
+        CommonOH.click(self.Phone2, 520, 520)
         code = CommonOH.getTextByCondition(self.Phone2, "请在设备端输入链接码进行验证", relativePath="AFTER")
         self.code = re.findall("[0-9]{6}", code)[0]
         #输pin码
-        CommonOH.click(self.Phone1, 300, 612, downtime=500)
+        CommonOH.click(self.Phone1, 300, 535, downtime=500)
         time.sleep(1)
         #切换至数字输入
         CommonOH.click(self.Phone1, 60, 1145)
@@ -64,7 +64,7 @@ class DistributedTest(TestCase):
                 CommonOH.click(self.Phone1, 46 + j * 70, 778)
         time.sleep(1)
         # 确定
-        CommonOH.click(self.Phone1, 500, 530)
+        CommonOH.click(self.Phone1, 500, 600)
 
     def sub_distributed_smoke_testcase_0300(self):
         # 切入后台，结束进程
