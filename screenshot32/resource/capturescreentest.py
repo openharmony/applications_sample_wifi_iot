@@ -608,7 +608,6 @@ if __name__ == "__main__":
                 EnterShellCmd("hilog -w stop", 1)
                 EnterShellCmd("cd /data/log/hilog && tar -cf distributed_log.tar *", 1)
                 GetFileFromDev("/data/log/hilog/distributed_log.tar", args.save_path)
-                SysExit()
 
     EnterShellCmd("cd /data/log/faultlog/temp && tar -cf after_test_crash_log_{}.tar cppcrash*".format(args.device_num))
     GetFileFromDev("/data/log/faultlog/temp/after_test_crash_log_{}.tar".format(args.device_num), \
