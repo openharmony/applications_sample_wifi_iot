@@ -139,7 +139,7 @@
         "entry": "aa start -a ohos.samples.distributedmusicplayer.MainAbility -b ohos.samples.distributedmusicplayer",
         "kill_distributedmusicplayer": ["killall ohos.samples.distributedmusicplayer"],
         "all_actions": [
-            [2, "permisson_ok-x-y"], [2, "permisson_ok-x-y"], [2, "permisson_ok-x-y"], [2, "shot_cmd"], [1, "cmp_cmd-level"], [1, "kill_distributedmusicplayer"]
+            [2, "permisson_ok-x-y"], [2, "permisson_ok-x-y"], [2, "permisson_ok-x-y"], [2, "shot_cmd"], [1, "cmp_cmd-level", 960000], [1, "kill_distributedmusicplayer"]
         ]
     }
 ]
