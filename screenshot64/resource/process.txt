@@ -31,7 +31,6 @@ distributeddata
 useriam
 inputmethod_ser
 ui_service
-fms_service
 distributedfile
 netmanager
 battery_stats
