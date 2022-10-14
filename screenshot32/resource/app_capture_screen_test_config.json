@@ -1,7 +1,7 @@
 [
     {
-        "DEVICE_1":[2, 3, 8, 9, 10],
-        "DEVICE_2":[1, 4, 5, 6, 7, 11, 12],
+        "DEVICE_1":[1, 2, 3, 8, 10, 12],
+        "DEVICE_2":[4, 5, 6, 7, 9, 11],
         "return-x-y":[210, 1240],
         "recent-x-y":[515, 1240],
         "home-x-y":[360, 1240],
@@ -10,8 +10,7 @@
         "take_photos-x-y":[360, 1095],
         "convert_to_video-x-y":[430, 980],
         "convert_to_photos-x-y":[200, 1095],
-        "last_photos-x-y":[100, 200],
-        "album_click-x-y":[530, 1150],
+        "last_photos-x-y":[100, 220],
         "stop_video-x-y":[320, 1095],
         "phone-x-y":[565, 1045],
         "shot_cmd":[""],
@@ -25,7 +24,6 @@
         "app_name": "crash_check",
         "entry": "",
         "compress_file_recv":["cd /data/log/faultlog/temp && tar -cf crash_log.tar cppcrash*"],
-        "crash_check":["ls /data/log/faultlog/temp/ -al | wc -l", ""],
         "all_actions": [
             [1, "remount"], [1, "process_crash_check", "foundation"], [1, "process_crash_check", "render_service"], [1, "process_crash_check", "appspawn"], [1, "compress_file_recv"],
             [1, "get_file_from_dev", "/data/log/faultlog/temp/crash_log.tar"]
@@ -49,18 +47,6 @@
         ]
     },
     {
-        "app_name": "photos",
-        "entry": "",
-        "start_screenshot": ["aa start -a com.ohos.screenshot.ServiceExtAbility -b com.ohos.screenshot"],
-        "start_photos": ["aa start -a com.ohos.photos.MainAbility -b com.ohos.photos"],
-        "cp_db": ["cp /data/app/el2/100/database/com.ohos.medialibrary.medialibrarydata/rdb/media_library.db /data/photo.db"],
-        "kill_photos": ["killall com.ohos.photos"],
-        "all_actions": [
-            [8, "start_screenshot"], [8, "start_screenshot"], [5, "start_photos"], [2, "album_click-x-y"], [2, "last_photos-x-y"], [2, "last_photos-x-y"], [2, "shot_cmd"], [1, "cmp_cmd-level"],
-            [1, "cp_db"], [1, "get_file_from_dev", "/data/photo.db"], [2, "photo_check"], [1, "process_check", "com.ohos.medialibrary.medialibrarydata"], [2, "sandbox_path_check"], [1, "kill_photos"]
-        ]
-    },
-    {
         "app_name": "video_test",
         "entry": "",
         "mk_test_dir":["mkdir -p /data/app/el2/100/base/ohos.acts.multimedia.video.videoplayer/haps/entry/files"],
@@ -69,9 +55,25 @@
         "compress_log":["cd /data/log/hilog && tar -cf video_log.tar *"],
         "kill_video": ["killall ohos.acts.multimedia.video.videoplayer"],
         "all_actions": [
-          [1,"start_video_log"], [2, "install_hap", "vediotest/ActsVideoPlayerJsTest.hap"], [1, "mk_test_dir"], [1, "remount"], 
+          [1,"start_video_log"], [2, "install_hap", "vediotest/ActsVideoPlayerJsTest.hap"], [1, "mk_test_dir"], [1, "remount"],
           [1, "send_file_to_dev", "vediotest/H264_AAC.mp4", "/data/app/el2/100/base/ohos.acts.multimedia.video.videoplayer/haps/entry/files/"],
-          [15, "start_test"], [1, "stop_hilog"], [1, "compress_log"], [1, "get_file_from_dev", "/data/log/hilog/video_log.tar"], [1, "kill_video"]
+          [5, "start_test"], [1, "stop_hilog"], [1, "compress_log"], [1, "get_file_from_dev", "/data/log/hilog/video_log.tar"], [1, "kill_video"]
+        ]
+    },
+    {
+        "app_name": "camera",
+        "entry": "",
+        "check_result":["cd /data/log/hilog && grep -nr PreviewOutputCallback", "OnFrameStarted"],
+        "compress_log":["cd /data/log/hilog && tar -cf camera_log.tar *"],
+        "open_camera_log":["rm /data/log/hilog/* && hilog -b X;hilog -b D -T CAMERA;hilog -r"],
+        "start_camera":["aa start -a com.ohos.camera.MainAbility -b com.ohos.camera"],
+        "recover_log":["cd data/log/hilog/;hilog -x > camera_log.txt;hilog -b D"],
+        "kill_camera": ["killall com.ohos.camera"],
+        "kill_photos": ["killall com.ohos.photos"],
+        "all_actions": [
+            [1, "open_camera_log"], [5, "start_camera"], [3, "take_photos-x-y"], [2, "convert_to_video-x-y"], [3, "take_photos-x-y"], [2, "stop_video-x-y"], [6, "convert_to_photos-x-y"],
+            [2, 670, 40], [1, "recover_log"], [1, "check_result"], [1, "shot_cmd", "camera_to_photos"], [1, "cmp_cmd-level", 1900000], [1, "compress_log"],
+            [1, "get_file_from_dev", "/data/log/hilog/camera_log.tar"], [1, "kill_camera"], [1, "kill_photos"]
         ]
     },
     {
@@ -86,18 +88,15 @@
         ]
     },
     {
-        "app_name": "camera",
+        "app_name": "photos",
         "entry": "",
-        "check_result":["cd /data/log/hilog && grep -nr PreviewOutputCallback", "OnFrameStarted"],
-        "compress_log":["cd /data/log/hilog && tar -cf camera_log.tar *"],
-        "open_camera_log":["rm /data/log/hilog/* && hilog -b X;hilog -b D -T CAMERA;hilog -r"],
-        "start_camera":["aa start -a com.ohos.camera.MainAbility -b com.ohos.camera"],
-        "recover_log":["cd data/log/hilog/;hilog -x > camera_log.txt;hilog -b D"],
-        "kill_camera": ["killall com.ohos.camera"],
+        "start_screenshot": ["aa start -a com.ohos.screenshot.ServiceExtAbility -b com.ohos.screenshot"],
+        "start_photos": ["aa start -a com.ohos.photos.MainAbility -b com.ohos.photos"],
+        "cp_db": ["cp /data/app/el2/100/database/com.ohos.medialibrary.medialibrarydata/rdb/media_library.db /data/photo.db"],
+        "kill_photos": ["killall com.ohos.photos"],
         "all_actions": [
-            [1, "open_camera_log"], [5, "start_camera"], [2, "take_photos-x-y"], [3, "take_photos-x-y"], [2, "convert_to_video-x-y"], [5, "take_photos-x-y"], [2, "stop_video-x-y"],
-            [6, "convert_to_photos-x-y"], [2, 670, 40], [1, "recover_log"], [1, "check_result"], [1, "shot_cmd", "camera_to_photos"], [1, "cmp_cmd-level", 1900000], [1, "compress_log"],
-            [1, "get_file_from_dev", "/data/log/hilog/camera_log.tar"], [1, "kill_camera"]
+            [8, "start_screenshot"], [5, "start_photos"], [2, "last_photos-x-y"], [2, "shot_cmd"], [1, "cmp_cmd-level"], [1, "cp_db"], [1, "get_file_from_dev", "/data/photo.db"],
+            [2, "photo_check"], [1, "process_check", "com.ohos.medialibrary.medialibrarydata"], [2, "sandbox_path_check"], [1, "kill_photos"]
         ]
     },
     {

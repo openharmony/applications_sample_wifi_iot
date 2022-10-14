@@ -73,6 +73,7 @@ class DistributedTest(TestCase):
                 j = int(i) - 1
                 CommonOH.click(self.Phone1, 46 + j * 70, 778)
         time.sleep(1)
+        CommonOH.click(self.Phone1, 60, 1145)
         # 确定
         CommonOH.click(self.Phone1, 500, 600)
 
