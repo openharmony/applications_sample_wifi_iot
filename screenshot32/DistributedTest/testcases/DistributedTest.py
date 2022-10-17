@@ -4,6 +4,7 @@ import threading
 import re
 from devicetest.core.test_case import TestCase
 from devicetest.aw.OpenHarmony import CommonOH
+from testcases.orc import Orc
 
 
 class DistributedTest(TestCase):
@@ -38,17 +39,26 @@ class DistributedTest(TestCase):
         # 授权
         CommonOH.click(self.Phone1, 500, 706)
         CommonOH.click(self.Phone1, 500, 706)
-        CommonOH.touchByType(self.Phone1, "image", index=1)
+        CommonOH.hdc_std(self.Phone1, "shell snapshot_display -f /data/distributedcalc_step1.png")
+        CommonOH.hdc_std(self.Phone1, "file recv /data/distributedcalc_step1.png testcases\\distributedcalc_step1.png")
+        CommonOH.click(self.Phone1, 610, 110)
+        time.sleep(3)
+        CommonOH.click(self.Phone1, 380, 1150)
+        CommonOH.click(self.Phone1, 610, 110)
+        time.sleep(3)
+        CommonOH.hdc_std(self.Phone1, "shell snapshot_display -f /data/distributedcalc_step2.png")
+        CommonOH.hdc_std(self.Phone1, "file recv /data/distributedcalc_step2.png testcases\\distributedcalc_step2.png")
+        CommonOH.click(self.Phone1, 580, 1090)
         time.sleep(1)
-        CommonOH.touchByText(self.Phone1, "取消")
-        CommonOH.touchByType(self.Phone1, "image", index=1)
-        time.sleep(1)
-        CommonOH.touchByType(self.Phone1, "input", index=1)
-        time.sleep(1)
+        CommonOH.hdc_std(self.Phone2, "shell snapshot_display -f /data/distributedcalc_step3.png")
+        CommonOH.hdc_std(self.Phone2, "file recv /data/distributedcalc_step3.png testcases\\distributedcalc_step3.png")
         #确定
         CommonOH.click(self.Phone2, 520, 520)
         CommonOH.click(self.Phone2, 520, 520)
-        code = CommonOH.getTextByCondition(self.Phone2, "请在设备端输入链接码进行验证", relativePath="AFTER")
+        CommonOH.hdc_std(self.Phone2, "shell snapshot_display -f /data/distributedcalc_step4.png")
+        CommonOH.hdc_std(self.Phone2, "file recv /data/distributedcalc_step4.png testcases\\distributedcalc_step4.png")
+        time.sleep(1)
+        code = Orc("testcases\\distributedcalc_step4.png")
         self.code = re.findall("[0-9]{6}", code)[0]
         #输pin码
         CommonOH.click(self.Phone1, 300, 535, downtime=500)
@@ -63,6 +73,7 @@ class DistributedTest(TestCase):
                 j = int(i) - 1
                 CommonOH.click(self.Phone1, 46 + j * 70, 778)
         time.sleep(1)
+        CommonOH.click(self.Phone1, 60, 1145)
         # 确定
         CommonOH.click(self.Phone1, 500, 600)
 
@@ -74,8 +85,10 @@ class DistributedTest(TestCase):
         CommonOH.startAbility(self.Phone1, "ohos.samples.distributedcalc.MainAbility", "ohos.samples.distributedcalc")
         time.sleep(2)
         # 拉起远端设备
-        CommonOH.touchByType(self.Phone1, "image", index=1)
+        CommonOH.click(self.Phone1, 610, 110)
         time.sleep(3)
+        CommonOH.hdc_std(self.Phone1, "shell snapshot_display -f /data/distributedcalc_step5.png")
+        CommonOH.hdc_std(self.Phone1, "file recv /data/distributedcalc_step5.png testcases\\distributedcalc_step5.png")
         CommonOH.click(self.Phone1, 580, 1090)
         CommonOH.click(self.Phone1, 580, 1090)
         # 设备二授权
@@ -83,7 +96,12 @@ class DistributedTest(TestCase):
         CommonOH.click(self.Phone2, 500, 706)
         CommonOH.click(self.Phone2, 500, 706)
         # 校验远端计算器是否被拉起
-        CommonOH.checkIfTextExist(self.Phone2, "计算器", pattern="EQUALS", expect=True)
+        CommonOH.hdc_std(self.Phone2, "shell snapshot_display -f /data/distributedcalc_step6.png")
+        CommonOH.hdc_std(self.Phone2, "file recv /data/distributedcalc_step6.png testcases\\distributedcalc_step6.png")
+        CommonOH.hdc_std(self.Phone2, 'shell "aa dump -a | grep distributedcalc > /data/report.txt"')
+        CommonOH.hdc_std(self.Phone2, "file recv /data/report.txt testcases\\report.txt")
+        time.sleep(1)
+        CommonOH.hdc_std(self.Phone1, "file send testcases\\report.txt /data/report.txt")
 
     def net_connect1(self):
         # 点亮屏幕
@@ -99,7 +117,5 @@ class DistributedTest(TestCase):
 
     def teardown(self):
         # 切入后台，结束进程
-        CommonOH.click(self.Phone1, 512, 1246)
-        CommonOH.click(self.Phone2, 512, 1246)
-        CommonOH.click(self.Phone1, 360, 1168)
-        CommonOH.click(self.Phone2, 360, 1168)
+        CommonOH.hdc_std(self.Phone1, "shell killall ohos.samples.distributedcalc")
+        CommonOH.hdc_std(self.Phone2, "shell killall ohos.samples.distributedcalc")

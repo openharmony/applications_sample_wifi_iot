@@ -26,6 +26,7 @@ import datetime
 import sqlite3
 import shutil
 
+
 def PrintToLog(str):
     time = datetime.datetime.now()
     str = "[{}] {}".format(time, str)
@@ -37,6 +38,7 @@ def PrintToLog(str):
         print(str)
         sys.stdout = console
     log_file.close()
+
 
 def EnterCmd(mycmd, waittime=0, printresult=1):
     if mycmd == "":
@@ -76,30 +78,35 @@ def EnterCmd(mycmd, waittime=0, printresult=1):
             cmd_f.close()
     return result
 
+
 def EnterShellCmd(shellcmd, waittime=0, printresult=1):
     if shellcmd == "":
         return
     cmd = "hdc_std -t {} shell \"{}\"".format(args.device_num, shellcmd)
     return EnterCmd(cmd, waittime, printresult)
 
+
 def SysExit():
-    EnterShellCmd("cd /data/log/faultlog/temp && tar -cf after_test_crash_log_{}.tar cppcrash*".format(args.device_num))
-    GetFileFromDev("/data/log/faultlog/temp/after_test_crash_log_{}.tar".format(args.device_num), \
+    EnterShellCmd("cd /data/log/faultlog/temp && tar -cf after_test_cppcrash{}.tar cppcrash*".format(args.device_num))
+    GetFileFromDev("/data/log/faultlog/temp/after_test_cppcrash{}.tar".format(args.device_num), \
+    os.path.normpath(args.save_path))
+    EnterShellCmd("cd /data/log/faultlog/faultlogger && tar -cf after_test_jscrash{}.tar jscrash*".format(args.device_num))
+    GetFileFromDev("/data/log/faultlog/faultlogger/after_test_jscrash{}.tar".format(args.device_num), \
     os.path.normpath(args.save_path))
     PrintToLog("SmokeTest:: SmokeTest find some key problems!")
     PrintToLog("SmokeTest:: End of check, test failed!")
     sys.exit(98)
 
+
 def SendFileToDev(src, dst):
     cmd = "hdc_std -t {} file send \"{}\" \"{}\"".format(args.device_num, src, dst)
     return EnterCmd(cmd, 1, 1)
+
 
 def GetFileFromDev(src, dst):
     cmd = "hdc_std -t {} file recv \"{}\" \"{}\"".format(args.device_num, src, dst)
     return EnterCmd(cmd, 1, 1)
 
-def is_image_file(filename):
-    return any(filename.endswith(extension) for extension in IMG_EXTENSIONS)
 
 def ImageCheck(str, testnum=1):
     conn = sqlite3.connect(str)
@@ -135,6 +142,7 @@ def ImageCheck(str, testnum=1):
         PrintToLog("SmokeTest:: error: There are no photos or videos in the album!!")
         return -1
 
+
 def ConnectionJudgment():
     connection_status = EnterCmd("hdc_std list targets", 2)
     connection_cnt = 0
@@ -145,6 +153,33 @@ def ConnectionJudgment():
         PrintToLog("SmokeTest:: Device disconnection!!")
         PrintToLog("SmokeTest:: End of check, test failed!")
         sys.exit(101)
+
+
+def sandbox_check(process):
+    PrintToLog("SmokeTest:: start to check sandbox path")
+    medialibrarydata_pidnum = EnterShellCmd("pgrep -f {}".format(process), 1)
+    medialibrarydata_pidnum = medialibrarydata_pidnum.strip()
+    sandboxf = EnterShellCmd("echo \"ls /storage/media/local/\"|nsenter -t {} -m sh".format(medialibrarydata_pidnum), 1)
+    if "files" not in sandboxf:
+        PrintToLog("SmokeTest:: error: can not find sandbox path : /storage/media/local/files")
+        return -1
+    else:
+        PrintToLog("SmokeTest:: success: find sandbox path : /storage/media/local/files")
+        return 1
+
+
+def is_image_file(filename):
+    IMG_EXTENSIONS = ['.png', '.PNG']
+    return any(filename.endswith(extension) for extension in IMG_EXTENSIONS)
+
+def picture_save(pic_path):
+    for root, dirs, files in os.walk(pic_path):
+        for file in files:
+            file_path = os.path.join(root, file)
+            if is_image_file(file_path):
+                shutil.copy2(file_path, args.save_path)
+                PrintToLog("SmokeTest:: send {} to save_path Successfully".format(file_path))
+
 
 def ConnectToWifi(tools_path):
     EnterShellCmd("mkdir /data/l2tool", 1)
@@ -186,6 +221,7 @@ def ConnectToWifi(tools_path):
         cnt -= 1
         time.sleep(5)
 
+
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description='manual to this script')
     parser.add_argument('--config', type=str, default = './app_capture_screen_test_config.json')
@@ -201,16 +237,10 @@ if __name__ == "__main__":
         result = EnterCmd("hdc_std list targets", 1, 0)
         print(result)
         args.device_num = result.split()[0]
-
     with open(args.config) as f:
         all_app = json.load(f)
-
     cmp_status = 0
     global_pos = all_app[0]
-
-    IMG_EXTENSIONS = [
-    '.jpg', '.JPG', '.jpeg', '.JPEG', '.png', '.PNG', 
-    ]
 
     rebootcnt = 2
     while rebootcnt:
@@ -224,7 +254,6 @@ if __name__ == "__main__":
             EnterShellCmd("uinput -T -m 425 1000 425 400;power-shell wakeup;uinput -T -m 425 400 425 1000;\
             power-shell setmode 602;uinput -T -m 425 1000 425 400;", 1)
             rmlockcnt -= 1
-
         EnterShellCmd("hilog -w stop", 1)
         EnterShellCmd("cd /data/log/hilog && tar -cf system_start_log_{}.tar *".format(args.device_num), 1)
         GetFileFromDev("/data/log/hilog/system_start_log_{}.tar".format(args.device_num), args.save_path)
@@ -281,6 +310,57 @@ if __name__ == "__main__":
     else:
         PrintToLog("SmokeTest:: first processes check is ok")
 
+    if "1/2" in args.test_num or "2/2" in args.test_num:
+        EnterShellCmd("param set persist.ace.testmode.enabled 1", 1)
+        EnterShellCmd("rm /data/log/hilog/*;hilog -r;hilog -Q pidoff;hilog -Q domainoff;hilog -G 512M;hilog -b D", 1)
+        picture_path = os.path.normpath(os.path.join(args.tools_path, "DistributedTest\\testcases"))
+        report_path = os.path.normpath(os.path.join(args.tools_path, "DistributedTest\\testcases\\report.txt"))
+        if args.test_num == "2/2":
+            EnterShellCmd("ifconfig eth0 192.168.0.1", 1)
+            ping_result = EnterShellCmd("ping 192.168.0.2 -i 1 -c 2", 3)
+            file_is_exist = EnterShellCmd("cd /data; find . -name report.txt")
+            ping_cnt = 0
+            wait_cnt = 0
+            while "2 packets transmitted, 2 received" not in ping_result and ping_cnt < 60:
+                ping_result = EnterShellCmd("ping 192.168.0.2 -i 1 -c 2", 3)
+                ping_cnt += 1
+            if ping_cnt == 60:
+                PrintToLog("SmokeTest:: Ping failed, timeout of 3 minutes")
+                SysExit()
+            while "report.txt" not in file_is_exist and wait_cnt < 60:
+                PrintToLog("SmokeTest:: waiting for the distributed test to end ")
+                file_is_exist = EnterShellCmd("cd /data; find . -name report.txt", 3)
+                wait_cnt += 1
+        elif args.test_num == "1/2":
+            EnterShellCmd("ifconfig eth0 192.168.0.2", 1)
+            ping_result = EnterShellCmd("ping 192.168.0.1 -i 1 -c 2", 3)
+            ping_cnt = 0
+            while "2 packets transmitted, 2 received" not in ping_result and ping_cnt < 60:
+                ping_result = EnterShellCmd("ping 192.168.0.1 -i 1 -c 2", 3)
+                ping_cnt += 1
+            if ping_cnt == 60:
+                PrintToLog("SmokeTest:: Ping failed, timeout of 3 minutes")
+            PrintToLog("SmokeTest:: ##### case 0 : distributed test start #####")
+            execute_path = os.path.normpath(os.path.join(args.tools_path, "DistributedTest"))
+            PrintToLog("SmokeTest:: execute_path {}".format(execute_path))
+            os.system("cd {} && python main.py run -l DistributedTest".format(execute_path))
+            distributed_result = ""
+            try:
+                with open(report_path, mode='r', encoding='utf-8', errors='ignore') as f:
+                    f.seek(0)
+                    distributed_result = f.read()
+                f.close()
+            except Exception as reason:
+                PrintToLog("SmokeTest:: report.txt is not exist!")
+            if "distributedcalc" in distributed_result:
+                picture_save(picture_path)
+                PrintToLog("SmokeTest:: testcase 0, distributed is ok!")
+            else:
+                picture_save(picture_path)
+                PrintToLog("SmokeTest:: error:testcase 0, distributed failed!")
+                SysExit()
+        EnterShellCmd("ifconfig eth0 down", 1)
+
     try:
         args.test_num.index('/')
         idx_total = args.test_num.split('/')
@@ -314,7 +394,6 @@ if __name__ == "__main__":
         testcnt = 3
         while testcnt:
             testok = 0
-            checkok = 1
             if testcnt != 3:
                 PrintToLog("SmokeTest:: this testcase try again >>>>>>:\n")
                 with open(os.path.join(args.save_path, 'test_{}.bat'.format(args.device_num)),\
@@ -388,10 +467,9 @@ if __name__ == "__main__":
                 elif type(single_action[1]) == str and single_action[1] == 'connect_wifi':
                     next_cmd = ""
                     ConnectToWifi(args.tools_path)
-                elif type(single_action[1]) == str and single_action[1] == 'camera_photo_check':
+                elif type(single_action[1]) == str and single_action[1] == 'sandbox_path_check':
                     next_cmd = ""
-                    if ImageCheck("{}\\camera_photo.db".format(os.path.normpath(args.save_path)),\
-                    1) == 1 and testok == 1:
+                    if sandbox_check("com.ohos.medialibrary.medialibrarydata") == 1 and testok == 1:
                         testok = 1
                     else:
                         testok = -1
@@ -407,12 +485,12 @@ if __name__ == "__main__":
                         p = EnterShellCmd("ps -elf", single_action[0])
                         result = "".join(p)
                         findsome = result.find(single_action[2], 0, len(result))
-                        if findsome != -1:
-                            checkok = 1
+                        if findsome != -1 and testok == 1:
+                            testok = 1
                             PrintToLog("SmokeTest:: \"{}\" is ok, find process \"{}\"!".format(single_action[1],\
                             single_action[2]))
                         else:
-                            checkok = -1
+                            testok = -1
                             PrintToLog("SmokeTest:: \"{}\" failed, not find process \"{}\"!".format(single_action[1],\
                             single_action[2]))
                         sys.stdout.flush()
@@ -459,16 +537,9 @@ if __name__ == "__main__":
                     next_cmd = "uinput -M -m {} {} -c 0".format(single_action[1], single_action[2])
                 EnterShellCmd(next_cmd, single_action[0])
 
-            if testok == 1 and checkok == 1:
+            if testok == 1:
                 PrintToLog("SmokeTest:: testcase {}, {} is ok!".format(idx, single_app['app_name']))
                 testcnt = 0
-            elif testok == 1 and checkok == -1:
-                if testcnt == 1:
-                    fail_idx_list.append(idx)
-                    fail_name_list.append(single_app['app_name'])
-                    smoke_first_failed = single_app['app_name']
-                    PrintToLog("SmokeTest:: error:testcase {}, {} is failed!".format(idx, single_app['app_name']))
-                testcnt -= 1
             elif testok == -1 and smoke_first_failed == '':
                 if testcnt == 1:
                     fail_idx_list.append(idx)
@@ -484,16 +555,6 @@ if __name__ == "__main__":
             else:
                 testcnt = 0
             ConnectionJudgment()
-
-    PrintToLog("SmokeTest:: start to check sandbox path")
-    medialibrarydata_pidnum = EnterShellCmd("pgrep -f com.ohos.medialibrary.medialibrarydata", 1)
-    medialibrarydata_pidnum = medialibrarydata_pidnum.strip()
-    sandboxf = EnterShellCmd("echo \"ls /storage/media/local/\"|nsenter -t {} -m sh".format(medialibrarydata_pidnum), 1)
-    if "files" not in sandboxf:
-        PrintToLog("SmokeTest:: error: can not find sandbox path : /storage/media/local/files")
-        SysExit()
-    else:
-        PrintToLog("SmokeTest:: success: find sandbox path : /storage/media/local/files")
 
     PrintToLog("\nSmokeTest:: ########## Second check key processes start ##############")
     second_check_lose_process = []
@@ -522,98 +583,8 @@ if __name__ == "__main__":
     else:
         PrintToLog("SmokeTest:: second processes check is ok")
 
-    pr_analysis = args.pr_url
-    PrintToLog("SmokeTest:: get pr: {}".format(args.pr_url))
-    if "openharmony" in pr_analysis:
-        EnterShellCmd("param set persist.ace.testmode.enabled 1", 1)
-        PrintToLog("SmokeTest:: close selinux")
-        EnterShellCmd("mount -o rw,remount /", 1)
-        EnterShellCmd("sed -i 's/enforcing/permissive/g' /system/etc/selinux/config", 1)
-        EnterShellCmd("cat /system/etc/selinux/config | grep SELINUX=", 1)
-        EnterShellCmd("reboot")
-        hdc_list = EnterCmd("hdc_std list targets", 3)
-        waitcnt = 0
-        while args.device_num not in hdc_list and waitcnt < 15:
-            hdc_list = EnterCmd("hdc_std list targets", 3)
-            waitcnt += 1
-        PrintToLog("SmokeTest:: start remove lock")
-        unlockcnt = 3
-        while unlockcnt:
-            EnterShellCmd("uinput -T -m 425 1000 425 400;power-shell wakeup;\
-            uinput -T -m 425 400 425 1000;power-shell setmode 602;uinput -T -m 425 1000 425 400;", 1)
-            unlockcnt -= 1
-        if args.test_num == "2/2":
-            EnterShellCmd("ifconfig eth0 192.168.0.1", 1)
-            ping_result = EnterShellCmd("ping 192.168.0.2 -i 1 -c 2", 3)
-            ping_cnt = 0
-            while "2 packets transmitted, 2 received" not in ping_result and ping_cnt < 60:
-                ping_result = EnterShellCmd("ping 192.168.0.2 -i 1 -c 2", 5)
-                ping_cnt += 1
-            if len(fail_idx_list) != 0:
-                PrintToLog("SmokeTest:: error: name {}, index {}, these testcase is failed".format(fail_name_list,\
-                fail_idx_list))
-                SysExit()
-            if ping_cnt == 60:
-                PrintToLog("SmokeTest:: Ping failed, timeout of 5 minutes")
-                PrintToLog("SmokeTest:: please check the testcase {}".format(fail_name_list))
-                SysExit()
-        elif args.test_num == "1/2":
-            EnterShellCmd("ifconfig eth0 192.168.0.2", 1)
-            ping_result = EnterShellCmd("ping 192.168.0.1 -i 1 -c 2", 3)
-            ping_cnt = 0
-            while "2 packets transmitted, 2 received" not in ping_result and ping_cnt < 60:
-                ping_result = EnterShellCmd("ping 192.168.0.1 -i 1 -c 2", 5)
-                ping_cnt += 1
-            if ping_cnt == 60:
-                PrintToLog("SmokeTest:: Ping failed, timeout of 5 minutes")
-                PrintToLog("SmokeTest:: please check the testcase {}".format(fail_name_list))
-                SysExit()
-            PrintToLog("SmokeTest:: ##### case 13 : distributed test start #####")
-            execute_path = os.path.normpath(os.path.join(args.tools_path, "DistributedTest"))
-            PrintToLog("SmokeTest:: execute_path {}".format(execute_path))
-            EnterShellCmd("rm /data/log/hilog/*;hilog -r;hilog -w start -l 400000000 -m none", 1)
-            os.system("cd {} && python main.py run -l DistributedTest".format(execute_path))
-            report_path = os.path.normpath(os.path.join(args.tools_path, "DistributedTest\\reports"))
-            PrintToLog("SmokeTest:: report_path {}".format(report_path))
-            task_file = "task_log.log"
-            file_name = ''
-            distributed_result = 0
-            for root, dirs, files in os.walk(report_path):
-                for file in files:
-                    file_path = os.path.join(root, file)
-                    if is_image_file(file_path):
-                        shutil.copy2(file_path, args.save_path)
-                        PrintToLog("SmokeTest:: send {} to save_path Successfully".format(file_path))
-            for root, dirs, files in os.walk(report_path):
-                if task_file in files:
-                    file_name = os.path.join(root, task_file)
-            PrintToLog("SmokeTest:: file_name {}".format(file_name))
-            try:
-                with open(file_name, mode='r', encoding='utf-8', errors='ignore') as fs:
-                    report_lines = fs.readlines()
-                    for content in report_lines:
-                        if "total: 1, passed: 1" in content:
-                            distributed_result = 1
-                            break
-                fs.close()
-            except Exception as reason:
-                PrintToLog("SmokeTest:: task_log.log is not exist!")
-            if distributed_result == 1:
-                PrintToLog("SmokeTest:: testcase 13, distributed is ok!")
-            else:
-                PrintToLog("SmokeTest:: error:testcase 13, distributed failed!")
-                if len(fail_idx_list) != 0:
-                    PrintToLog("SmokeTest:: error: name {}, index {}, these testcase is failed".format(fail_name_list,\
-                    fail_idx_list))
-                EnterShellCmd("hilog -w stop", 1)
-                EnterShellCmd("cd /data/log/hilog && tar -cf distributed_log.tar *", 1)
-                GetFileFromDev("/data/log/hilog/distributed_log.tar", args.save_path)
-
-    EnterShellCmd("cd /data/log/faultlog/temp && tar -cf after_test_crash_log_{}.tar cppcrash*".format(args.device_num))
-    GetFileFromDev("/data/log/faultlog/temp/after_test_crash_log_{}.tar".format(args.device_num), \
-    os.path.normpath(args.save_path))
-    EnterShellCmd("cd /data/log/faultlog/temp && find . -name cppcrash*", 2)
-    EnterShellCmd("cd /data/log/faultlog/temp && grep \"Process name\" -rnw ./", 2)
+    EnterShellCmd("cd /data/log/faultlog/temp && grep \"Process name\" -rnw ./", 1)
+    EnterShellCmd("cd /data/log/faultlog/faultlogger && grep \"Process name\" -rnw ./", 1)
 
     fail_str_list = [str(x) for x in fail_idx_list]
     reboot_test_num = " ".join(fail_str_list)
