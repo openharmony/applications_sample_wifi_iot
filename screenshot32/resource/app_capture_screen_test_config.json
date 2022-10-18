@@ -92,10 +92,11 @@
         "entry": "",
         "start_screenshot": ["aa start -a com.ohos.screenshot.ServiceExtAbility -b com.ohos.screenshot"],
         "start_photos": ["aa start -a com.ohos.photos.MainAbility -b com.ohos.photos"],
-        "cp_db": ["cp /data/app/el2/100/database/com.ohos.medialibrary.medialibrarydata/rdb/media_library.db /data/photo.db"],
         "kill_photos": ["killall com.ohos.photos"],
         "all_actions": [
-            [8, "start_screenshot"], [5, "start_photos"], [2, "last_photos-x-y"], [2, "shot_cmd"], [1, "cmp_cmd-level"], [1, "cp_db"], [1, "get_file_from_dev", "/data/photo.db"],
+            [8, "start_screenshot"], [5, "start_photos"], [2, "last_photos-x-y"], [2, "shot_cmd"], [1, "cmp_cmd-level"],
+            [1, "get_file_from_dev", "/data/app/el2/100/database/com.ohos.medialibrary.medialibrarydata/rdb/media_library.db"],
+            [1, "get_file_from_dev", "/data/app/el2/100/database/com.ohos.medialibrary.medialibrarydata/rdb/media_library.db-wal"],
             [2, "photo_check"], [1, "process_check", "com.ohos.medialibrary.medialibrarydata"], [2, "sandbox_path_check"], [1, "kill_photos"]
         ]
     },

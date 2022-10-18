@@ -475,7 +475,7 @@ if __name__ == "__main__":
                         testok = -1
                 elif type(single_action[1]) == str and single_action[1] == 'photo_check':
                     next_cmd = ""
-                    if ImageCheck("{}\\photo.db".format(os.path.normpath(args.save_path)), 1) == 1 and testok == 1:
+                    if ImageCheck("{}\\media_library.db".format(os.path.normpath(args.save_path)), 1) == 1 and testok == 1:
                         testok = 1
                     else:
                         testok = -1
@@ -565,13 +565,11 @@ if __name__ == "__main__":
             if process_pid[pname] != pidlist:
                 if pname in two_check_process_list:
                     PrintToLog("SmokeTest:: error: pid of %s is different the first check" % pname)
-                    SysExit()
                 else:
                     PrintToLog("SmokeTest:: warnning: pid of %s is different the first check" % pname)
             elif len(pidlist) != 1:
                 if pname in two_check_process_list:
                     PrintToLog("SmokeTest:: error: pid of %s is not only one" % pname)
-                    SysExit()
                 else:
                     PrintToLog("SmokeTest:: warnning: pid of %s is not only one" % pname)
         except:
@@ -579,7 +577,6 @@ if __name__ == "__main__":
 
     if second_check_lose_process:
         PrintToLog("SmokeTest:: error: pid of %s is not exist" % pname)
-        SysExit()
     else:
         PrintToLog("SmokeTest:: second processes check is ok")
 
