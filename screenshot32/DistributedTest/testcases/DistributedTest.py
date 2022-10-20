@@ -42,14 +42,14 @@ class DistributedTest(TestCase):
         CommonOH.hdc_std(self.Phone1, "shell snapshot_display -f /data/distributedcalc_step1.png")
         CommonOH.hdc_std(self.Phone1, "file recv /data/distributedcalc_step1.png testcases\\distributedcalc_step1.png")
         CommonOH.click(self.Phone1, 610, 110)
-        time.sleep(3)
+        time.sleep(2)
         CommonOH.click(self.Phone1, 380, 1150)
         CommonOH.click(self.Phone1, 610, 110)
-        time.sleep(3)
+        time.sleep(2)
         CommonOH.hdc_std(self.Phone1, "shell snapshot_display -f /data/distributedcalc_step2.png")
         CommonOH.hdc_std(self.Phone1, "file recv /data/distributedcalc_step2.png testcases\\distributedcalc_step2.png")
         CommonOH.click(self.Phone1, 580, 1090)
-        time.sleep(1)
+        time.sleep(2)
         CommonOH.hdc_std(self.Phone2, "shell snapshot_display -f /data/distributedcalc_step3.png")
         CommonOH.hdc_std(self.Phone2, "file recv /data/distributedcalc_step3.png testcases\\distributedcalc_step3.png")
         #确定
@@ -57,11 +57,12 @@ class DistributedTest(TestCase):
         CommonOH.click(self.Phone2, 520, 520)
         CommonOH.hdc_std(self.Phone2, "shell snapshot_display -f /data/distributedcalc_step4.png")
         CommonOH.hdc_std(self.Phone2, "file recv /data/distributedcalc_step4.png testcases\\distributedcalc_step4.png")
-        time.sleep(1)
+        time.sleep(2)
         code = Orc("testcases\\distributedcalc_step4.png")
         self.code = re.findall("[0-9]{6}", code)[0]
         #输pin码
-        CommonOH.click(self.Phone1, 300, 535, downtime=500)
+        CommonOH.click(self.Phone1, 340, 530)
+        CommonOH.click(self.Phone1, 340, 530)
         time.sleep(1)
         #切换至数字输入
         CommonOH.click(self.Phone1, 60, 1145)
@@ -74,8 +75,10 @@ class DistributedTest(TestCase):
                 CommonOH.click(self.Phone1, 46 + j * 70, 778)
         time.sleep(1)
         CommonOH.click(self.Phone1, 60, 1145)
+        CommonOH.hdc_std(self.Phone1, "shell snapshot_display -f /data/distributedcalc_step5.png")
         # 确定
         CommonOH.click(self.Phone1, 500, 600)
+        CommonOH.hdc_std(self.Phone1, "file recv /data/distributedcalc_step5.png testcases\\distributedcalc_step5.png")
 
     def sub_distributed_smoke_testcase_0300(self):
         # 切入后台，结束进程
@@ -87,8 +90,8 @@ class DistributedTest(TestCase):
         # 拉起远端设备
         CommonOH.click(self.Phone1, 610, 110)
         time.sleep(3)
-        CommonOH.hdc_std(self.Phone1, "shell snapshot_display -f /data/distributedcalc_step5.png")
-        CommonOH.hdc_std(self.Phone1, "file recv /data/distributedcalc_step5.png testcases\\distributedcalc_step5.png")
+        CommonOH.hdc_std(self.Phone1, "shell snapshot_display -f /data/distributedcalc_step6.png")
+        CommonOH.hdc_std(self.Phone1, "file recv /data/distributedcalc_step6.png testcases\\distributedcalc_step6.png")
         CommonOH.click(self.Phone1, 580, 1090)
         CommonOH.click(self.Phone1, 580, 1090)
         # 设备二授权
@@ -96,8 +99,8 @@ class DistributedTest(TestCase):
         CommonOH.click(self.Phone2, 500, 706)
         CommonOH.click(self.Phone2, 500, 706)
         # 校验远端计算器是否被拉起
-        CommonOH.hdc_std(self.Phone2, "shell snapshot_display -f /data/distributedcalc_step6.png")
-        CommonOH.hdc_std(self.Phone2, "file recv /data/distributedcalc_step6.png testcases\\distributedcalc_step6.png")
+        CommonOH.hdc_std(self.Phone2, "shell snapshot_display -f /data/distributedcalc_step7.png")
+        CommonOH.hdc_std(self.Phone2, "file recv /data/distributedcalc_step7.png testcases\\distributedcalc_step7.png")
         CommonOH.hdc_std(self.Phone2, 'shell "aa dump -a | grep distributedcalc > /data/report.txt"')
         CommonOH.hdc_std(self.Phone2, "file recv /data/report.txt testcases\\report.txt")
         time.sleep(1)

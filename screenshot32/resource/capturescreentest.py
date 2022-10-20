@@ -310,6 +310,10 @@ if __name__ == "__main__":
     else:
         PrintToLog("SmokeTest:: first processes check is ok")
 
+    power_state = EnterShellCmd("hidumper -s 3308", 1)
+    if "State=2" not in power_state:
+        PrintToLog("SmokeTest:: DISPLAY POWER MANAGER DUMP State=0")
+        SysExit()
     if "1/2" in args.test_num or "2/2" in args.test_num:
         EnterShellCmd("param set persist.ace.testmode.enabled 1", 1)
         EnterShellCmd("rm /data/log/hilog/*;hilog -r;hilog -Q pidoff;hilog -Q domainoff;hilog -G 512M;hilog -b D", 1)
