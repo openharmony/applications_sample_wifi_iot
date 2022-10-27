@@ -51,7 +51,7 @@ vibrator_host
 sensor_host
 input_user_host
 camera_host
-audio_hdi_server_host
+audio_host
 wifi_host
 usb_host
 blue_host
