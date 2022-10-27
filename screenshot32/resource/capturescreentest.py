@@ -169,7 +169,7 @@ def sandbox_check(process):
 
 
 def is_image_file(filename):
-    IMG_EXTENSIONS = ['.png', '.PNG']
+    IMG_EXTENSIONS = ['.png', '.PNG', 'jpeg']
     return any(filename.endswith(extension) for extension in IMG_EXTENSIONS)
 
 def picture_save(pic_path):
