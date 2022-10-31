@@ -362,7 +362,6 @@ if __name__ == "__main__":
             else:
                 picture_save(picture_path)
                 PrintToLog("SmokeTest:: error:testcase 0, distributed failed!")
-                SysExit()
         EnterShellCmd("ifconfig eth0 down", 1)
 
     try:
