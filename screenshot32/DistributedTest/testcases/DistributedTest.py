@@ -37,8 +37,8 @@ class DistributedTest(TestCase):
         CommonOH.startAbility(self.Phone1, "ohos.samples.distributedcalc.MainAbility", "ohos.samples.distributedcalc")
         time.sleep(2)
         # 授权
-        CommonOH.click(self.Phone1, 500, 706)
-        CommonOH.click(self.Phone1, 500, 706)
+        CommonOH.click(self.Phone1, 500, 1130)
+        CommonOH.click(self.Phone1, 500, 1130)
         CommonOH.hdc_std(self.Phone1, "shell snapshot_display -f /data/distributedcalc_step1.png")
         CommonOH.hdc_std(self.Phone1, "file recv /data/distributedcalc_step1.png testcases\\distributedcalc_step1.png")
         CommonOH.click(self.Phone1, 610, 110)
@@ -93,8 +93,8 @@ class DistributedTest(TestCase):
         CommonOH.click(self.Phone1, 580, 1090)
         # 设备二授权
         time.sleep(2)
-        CommonOH.click(self.Phone2, 500, 706)
-        CommonOH.click(self.Phone2, 500, 706)
+        CommonOH.click(self.Phone2, 500, 1130)
+        CommonOH.click(self.Phone2, 500, 1130)
         # 校验远端计算器是否被拉起
         CommonOH.hdc_std(self.Phone2, "shell snapshot_display -f /data/distributedcalc_step6.png")
         CommonOH.hdc_std(self.Phone2, "file recv /data/distributedcalc_step6.png testcases\\distributedcalc_step6.png")
