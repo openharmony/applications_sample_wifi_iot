@@ -106,11 +106,11 @@ if __name__ == "__main__":
         PrintToLog("End of check, test failed!")
         sys.exit(99)
 
-    target_file = os.path.normpath(os.path.join(args.archive_path, "Hi3861_wifiiot_app_allinone.bin"))
+    target_file = os.path.normpath(os.path.join(args.archive_path, "OHOS_image.bin"))
     ret_size = os.path.getsize(target_file)/1024/1024
-    PrintToLog('Size of Hi3861_wifiiot_app_allinone.bin : {:.2f}M'.format(ret_size))
+    PrintToLog('Size of OHOS_image.bin : {:.2f}M'.format(ret_size))
     if ret_size > 1:
-        PrintToLog('ERROR: Size of Hi3861_wifiiot_app_allinone.bin ({:.2f}M) is over the upper limit(1M)'.format(ret_size))
+        PrintToLog('ERROR: Size of OHOS_image.bin ({:.2f}M) is over the upper limit(1M)'.format(ret_size))
         target_dir = os.path.normpath(os.path.join(args.archive_path, "libs"))
         GetDirSize(target_dir)
         PrintToLog("End of check, test failed!")
