@@ -144,10 +144,12 @@ if __name__ == "__main__":
         mem_size = int(mem_find[0].split()[2]) / 1024 / 1024
     else:
         PrintToLog('Error:can find memory usage info!')
+        PrintToLog("End of check, test failed!")
         sys.exit(99)
     if mem_size > 25:
         PrintToLog(
             'Error:memory usage is over the upper limit(25M),now is {:.2f}'.format(mem_size))
+        PrintToLog("End of check, test failed!")
         sys.exit(99)
 
     target_dir = os.path.normpath(os.path.join(args.archive_path, "rootfs"))
