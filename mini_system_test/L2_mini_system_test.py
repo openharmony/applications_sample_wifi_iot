@@ -139,6 +139,7 @@ if __name__ == "__main__":
     if process_usage > 40:
         PrintToLog(
             "ERROR: Processes usage cannot be greater than 40M, but currently it's actually %.2fM" % process_usage)
+        PrintToLog("End of check, test failed!")
         sys.exit(99)
 
     time.sleep(10)
