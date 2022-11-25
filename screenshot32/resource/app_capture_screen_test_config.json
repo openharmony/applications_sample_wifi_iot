@@ -11,7 +11,7 @@
         "convert_to_photos-x-y":[200, 1095],
         "last_photos-x-y":[100, 220],
         "stop_video-x-y":[320, 1095],
-        "phone-x-y":[565, 1045],
+        "phone-x-y":[645, 1060],
         "screenshot-x-y":[115,480],
         "shot_cmd":[""],
         "remount":["mount -o rw,remount"],
