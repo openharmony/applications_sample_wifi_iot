@@ -314,7 +314,7 @@ if __name__ == "__main__":
     if "State=2" not in power_state:
         PrintToLog("SmokeTest:: DISPLAY POWER MANAGER DUMP State=0")
         SysExit()
-    if "distributed on" in args.test_num:
+    if "1/2" in args.test_num or "2/2" in args.test_num:
         EnterShellCmd("param set persist.ace.testmode.enabled 1", 1)
         EnterShellCmd("rm /data/log/hilog/*;hilog -r;hilog -Q pidoff;hilog -Q domainoff;hilog -G 512M;hilog -b D", 1)
         picture_path = os.path.normpath(os.path.join(args.tools_path, "DistributedTest\\testcases"))
