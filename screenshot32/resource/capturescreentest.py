@@ -281,6 +281,8 @@ if __name__ == "__main__":
             PrintToLog("SmokeTest:: launcher screenshot comparison failed")
             SysExit()
 
+    EnterShellCmd("cat /proc/`pidof foundation`/smaps_rollup")
+
     PrintToLog("\nSmokeTest:: ########## First check key processes start ##############")
     lose_process = []
     process_pid = {}
