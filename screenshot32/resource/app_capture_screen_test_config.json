@@ -35,7 +35,7 @@
         "pull_down_cmd":["uinput -T -m 500 0 550 30"],
         "swipe_up_cmd":["uinput -T -m 500 500 550 300"],
         "all_actions": [
-            [2, "pull_down_cmd"], [2, "pull_down_cmd"], [2, "shot_cmd"], [2, "cmp_cmd-level"], [1, "swipe_up_cmd"], [1, "swipe_up_cmd"]
+            [2, "pull_down_cmd"], [2, "pull_down_cmd"], [2, "shot_cmd"], [1, "swipe_up_cmd"], [1, "swipe_up_cmd"]
         ]
     },
     {
