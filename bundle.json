@@ -23,10 +23,10 @@
         "deps": {
             "components": [
 	    	"utils_lite",
-		"liteos_m",
-		"peripheral",
-		"acts",
-		"samgr_lite"
+            "liteos_m",
+            "peripheral",
+            "acts",
+            "samgr_lite"
 	    ],
             "third_party": []
         },
