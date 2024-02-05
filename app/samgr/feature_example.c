@@ -271,7 +271,7 @@ static void CASE_AsyncTimeCall(DemoApi *demoApi)
     demoApi->AsyncTimeCall((IUnknown *)demoApi);
 }
 
-void AsyncHandler(const Request *request, const Response *response)
+static void AsyncHandler(const Request *request, const Response *response)
 {
     (void)request;
     printf("[LPC Test][TaskID:%u][Step:%u][AsyncCallBack]Success! Response:%s \n",
