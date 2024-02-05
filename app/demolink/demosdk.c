@@ -25,10 +25,8 @@
 static void *DemoSdkBiz(const char *arg)
 {
     (void)arg;
-    while (1) {
-        printf("it is demo biz: hello world.\n");
-        DemoSdkSleepMs(SECOND_CNT);
-    }
+    printf("it is demo biz: hello world.\n");
+    DemoSdkSleepMs(SECOND_CNT);
     return NULL;
 }
 
