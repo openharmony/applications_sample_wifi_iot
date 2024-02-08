@@ -16,7 +16,7 @@
 #include "ohos_init.h"
 #include "demosdk.h"
 
-void DemoSdkMain(void)
+static void DemoSdkMain(void)
 {
     DemoSdkEntry();
 }
