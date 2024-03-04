@@ -35,26 +35,24 @@ enum LedState g_ledState = LED_SPARK;
 static void *LedTask(const char *arg)
 {
     (void)arg;
-    while (1) {
-        switch (g_ledState) {
-            case LED_ON:
-                IoTGpioSetOutputVal(LED_TEST_GPIO, 1);
-                usleep(LED_INTERVAL_TIME_US);
-                break;
-            case LED_OFF:
-                IoTGpioSetOutputVal(LED_TEST_GPIO, 0);
-                usleep(LED_INTERVAL_TIME_US);
-                break;
-            case LED_SPARK:
-                IoTGpioSetOutputVal(LED_TEST_GPIO, 0);
-                usleep(LED_INTERVAL_TIME_US);
-                IoTGpioSetOutputVal(LED_TEST_GPIO, 1);
-                usleep(LED_INTERVAL_TIME_US);
-                break;
-            default:
-                usleep(LED_INTERVAL_TIME_US);
-                break;
-        }
+    switch (g_ledState) {
+        case LED_ON:
+            IoTGpioSetOutputVal(LED_TEST_GPIO, 1);
+            usleep(LED_INTERVAL_TIME_US);
+            break;
+        case LED_OFF:
+            IoTGpioSetOutputVal(LED_TEST_GPIO, 0);
+            usleep(LED_INTERVAL_TIME_US);
+            break;
+        case LED_SPARK:
+            IoTGpioSetOutputVal(LED_TEST_GPIO, 0);
+            usleep(LED_INTERVAL_TIME_US);
+            IoTGpioSetOutputVal(LED_TEST_GPIO, 1);
+            usleep(LED_INTERVAL_TIME_US);
+            break;
+        default:
+            usleep(LED_INTERVAL_TIME_US);
+            break;
     }
 
     return NULL;
